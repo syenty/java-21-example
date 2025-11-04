@@ -27,15 +27,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        User toSave = new User(user.getUsername(), user.getEmail());
+        User toSave = User.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .build();
         return repository.save(toSave);
     }
 
     @Override
     public Optional<User> update(Long id, User user) {
         return repository.findById(id).map(existing -> {
-            existing.setUsername(user.getUsername());
-            existing.setEmail(user.getEmail());
+            existing.update(user.getUsername(), user.getEmail());
             return repository.save(existing);
         });
     }

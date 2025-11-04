@@ -1,11 +1,21 @@
 package com.example.demo.admin.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@JsonDeserialize(builder = Admin.AdminBuilder.class)
 @Entity
 @Table(name = "admins")
 public class Admin {
@@ -16,42 +26,11 @@ public class Admin {
     private String name;
     private String email;
 
-    protected Admin() {
-        // JPA only
-    }
-
-    public Admin(String name, String email) {
+    public void update(String name, String email) {
         this.name = name;
         this.email = email;
     }
 
-    public Admin(Long id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class AdminBuilder {}
 }

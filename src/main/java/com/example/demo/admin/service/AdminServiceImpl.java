@@ -27,16 +27,17 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin create(Admin admin) {
-        // Ensure create persists a new entity (id null)
-        Admin toSave = new Admin(admin.getName(), admin.getEmail());
+        Admin toSave = Admin.builder()
+                .name(admin.getName())
+                .email(admin.getEmail())
+                .build();
         return repository.save(toSave);
     }
 
     @Override
     public Optional<Admin> update(Long id, Admin admin) {
         return repository.findById(id).map(existing -> {
-            existing.setName(admin.getName());
-            existing.setEmail(admin.getEmail());
+            existing.update(admin.getName(), admin.getEmail());
             return repository.save(existing);
         });
     }
