@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://prod-db-host:3306/mydb?useSSL=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://prod-db-host:3306/mydb?useSSL=true&serverTimezone=UTC&characterEncoding=UTF-8
     username: prod_user
     password: ${DB_PASSWORD} # 데이터베이스 비밀번호는 반드시 환경 변수나 Secret Manager를 통해 주입해야 합니다.
   jpa:
