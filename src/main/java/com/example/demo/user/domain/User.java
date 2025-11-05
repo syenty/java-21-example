@@ -1,36 +1,44 @@
 package com.example.demo.user.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@JsonDeserialize(builder = User.UserBuilder.class)
-@Entity
-@Table(name = "users")
+@Table(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-    private String email;
+    private String name;
 
-    public void update(String username, String email) {
-        this.username = username;
-        this.email = email;
+    @Column(name = "phone_number", nullable = false, unique = true)
+    private String phoneNumber;
+
+    @Column(name = "organization_code", nullable = false)
+    private String organizationCode;
+
+    public void update(String name, String phoneNumber, String organizationCode) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.organizationCode = organizationCode;
     }
 
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class UserBuilder {}
+    @Builder
+    private User(final String name, final String phoneNumber, final String organizationCode) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.organizationCode = organizationCode;
+    }
 }
