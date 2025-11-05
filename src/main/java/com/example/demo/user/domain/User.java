@@ -1,5 +1,7 @@
 package com.example.demo.user.domain;
 
+import com.example.demo.common.domain.BaseTimeEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,29 +18,29 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseTimeEntity {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String name;
+  private String name;
 
-    @Column(name = "phone_number", nullable = false, unique = true)
-    private String phoneNumber;
+  @Column(name = "phone_number", nullable = false, unique = true)
+  private String phoneNumber;
 
-    @Column(name = "organization_code", nullable = false)
-    private String organizationCode;
+  @Column(name = "organization_code", nullable = false)
+  private String organizationCode;
 
-    public void update(String name, String phoneNumber, String organizationCode) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.organizationCode = organizationCode;
-    }
+  public void update(String name, String phoneNumber, String organizationCode) {
+    this.name = name;
+    this.phoneNumber = phoneNumber;
+    this.organizationCode = organizationCode;
+  }
 
-    @Builder
-    private User(final String name, final String phoneNumber, final String organizationCode) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.organizationCode = organizationCode;
-    }
+  @Builder
+  private User(final String name, final String phoneNumber, final String organizationCode) {
+    this.name = name;
+    this.phoneNumber = phoneNumber;
+    this.organizationCode = organizationCode;
+  }
 }
