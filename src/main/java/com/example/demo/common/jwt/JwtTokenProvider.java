@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
-    private final SecretKey key;
+    private final SecretKey key;    
     private final long accessTokenValidityInMilliseconds;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey,
