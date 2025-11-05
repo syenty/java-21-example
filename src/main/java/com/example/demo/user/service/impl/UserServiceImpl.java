@@ -1,19 +1,20 @@
-package com.example.demo.user.service;
+package com.example.demo.user.service.impl;
 
 import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
-import org.springframework.stereotype.Service;
+import com.example.demo.user.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
-
-    public UserServiceImpl(UserRepository repository) {
-        this.repository = repository;
-    }
 
     @Override
     public List<User> getAll() {
@@ -28,8 +29,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(User user) {
         User toSave = User.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
+                .organizationCode(user.getOrganizationCode())
                 .build();
         return repository.save(toSave);
     }
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> update(Long id, User user) {
         return repository.findById(id).map(existing -> {
-            existing.update(user.getUsername(), user.getEmail());
+            existing.update(user.getName(), user.getPhoneNumber(), user.getOrganizationCode());
             return repository.save(existing);
         });
     }

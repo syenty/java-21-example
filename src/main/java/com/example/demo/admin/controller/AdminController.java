@@ -2,20 +2,20 @@ package com.example.demo.admin.controller;
 
 import com.example.demo.admin.domain.Admin;
 import com.example.demo.admin.service.AdminService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admins")
 public class AdminController {
     private final AdminService service;
-
-    public AdminController(AdminService service) {
-        this.service = service;
-    }
 
     @GetMapping
     public List<Admin> getAll() {
