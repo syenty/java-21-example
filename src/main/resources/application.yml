@@ -16,3 +16,7 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+jwt:
+  secret: V2eryV2eryV2eryV2eryV2eryV2eryV2eryV2erySecretKeyForJwtExampleProject # 32바이트 이상의 강력한 비밀 키를 사용해야 합니다.
+  access-token-validity-in-seconds: 86400 # 24시간
