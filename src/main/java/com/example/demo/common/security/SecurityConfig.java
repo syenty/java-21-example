@@ -1,9 +1,13 @@
 package com.example.demo.common.security;
 
+import com.example.demo.common.jwt.JwtAccessDeniedHandler;
 import com.example.demo.common.jwt.JwtAuthenticationFilter;
+import com.example.demo.common.jwt.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,10 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,19 +47,37 @@ public class SecurityConfig {
                 // 세션 관리 정책을 STATELESS로 설정 (JWT 기반 인증에 적합)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                // 예외 처리 핸들러 등록
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
+
                 // 요청 경로별 인가 설정
-                .authorizeHttpRequests(auth -> auth
-                        // Swagger UI 및 API 문서 경로는 모두 허용
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/login").permitAll()
-                        // /api/admins/** 경로는 ADMIN 역할을 가진 사용자만 접근 가능
-                        .requestMatchers("/api/admins/**").hasRole("ADMIN")
-                        // /api/users/** 경로는 USER 역할을 가진 사용자만 접근 가능 (예시)
-                        // .requestMatchers("/api/users/**").hasRole("USER")
-                        // 그 외 나머지 모든 요청은 인증만 되면 접근 가능
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(authorize -> {
+                    // 공개 URL 설정
+                    Endpoint.PUBLIC_URLS.forEach((url, methods) -> {
+                        for (String method : methods) {
+                            authorize.requestMatchers(HttpMethod.valueOf(method), url).permitAll();
+                        }
+                    });
+                    // ADMIN 역할 URL 설정
+                    Endpoint.ADMIN_URLS.forEach((url, methods) -> {
+                        for (String method : methods) {
+                            authorize.requestMatchers(HttpMethod.valueOf(method), url).hasRole("ADMIN");
+                        }
+                    });
+                    // USER 역할 URL 설정
+                    Endpoint.USER_URLS.forEach((url, methods) -> {
+                        for (String method : methods) {
+                            authorize.requestMatchers(HttpMethod.valueOf(method), url).hasRole("USER");
+                        }
+                    });
+                    authorize.anyRequest().denyAll(); // 명시적으로 허용된 요청 외에는 모두 차단
+                })
 
                 // JWT 필터 추가
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilter(new CorsConfig().corsFilter());
 
         return http.build();
     }

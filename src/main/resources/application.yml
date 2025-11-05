@@ -6,7 +6,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-      dialect: org.hibernate.dialect.MySQLDialect
   flyway:
     enabled: true
     locations: classpath:db/migration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
