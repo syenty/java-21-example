@@ -13,5 +13,5 @@ spring:
 jwt:
   # 로컬 환경에서는 테스트용 시크릿 키를 사용하고, 외부에 노출되지 않도록 주의해야 합니다.
   # 실제로는 환경 변수나 다른 방법을 통해 주입하는 것이 더 안전합니다.
-  secret: V2eryV2eryV2eryV2eryV2eryV2eryV2eryV2erySecretKeyForJwtExampleProject
+  secret: 6730m6MET6XnU8B0owZ0I7r67uxdsLrXOfwFNa4XnkUvdFTfoS2zDUduXiOmgNzwTnwJwR3yXa6yqIJNolXqGg==
   access-token-validity-in-seconds: 86400 # 24시간
