@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,7 +20,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table
+@Table(name = "quiz_participation_answer", uniqueConstraints = @UniqueConstraint(name = "uk_qpa_participation_quiz", columnNames = {
+    "participation_id", "quiz_id" }))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QuizParticipationAnswer {
 

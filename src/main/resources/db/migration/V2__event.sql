@@ -80,6 +80,7 @@ CREATE TABLE quiz_participation_answer (
         FOREIGN KEY (quiz_id) REFERENCES quiz(id),
     CONSTRAINT fk_qpa_option
         FOREIGN KEY (option_id) REFERENCES quiz_option(id),
+    UNIQUE KEY uk_qpa_participation_quiz (participation_id, quiz_id), -- 한 번 참여 시, 한 문항엔 답 한 번
     INDEX idx_qpa_participation (participation_id),
     INDEX idx_qpa_quiz (quiz_id)
 );
