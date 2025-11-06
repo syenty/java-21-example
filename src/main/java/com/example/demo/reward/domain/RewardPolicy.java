@@ -99,4 +99,43 @@ public class RewardPolicy extends BaseTimeEntity {
     this.rewardType = rewardType;
     this.rewardValue = rewardValue;
   }
+
+  public void changeEvent(Event event) {
+    this.event = event;
+  }
+
+  public void update(
+      String name,
+      RewardPolicyType policyType,
+      LocalDateTime startDt,
+      LocalDateTime endDt,
+      Integer winnerLimitTotal,
+      Integer winnerLimitPerDay,
+      Integer targetOrder,
+      RewardPolicyNthScope nthScope,
+      Integer userLimitTotal,
+      Integer userLimitPerDay,
+      RewardType rewardType,
+      String rewardValue) {
+    this.name = name;
+    if (policyType != null) {
+      this.policyType = policyType;
+    }
+    if (startDt != null) {
+      this.startDt = startDt;
+    }
+    if (endDt != null) {
+      this.endDt = endDt;
+    }
+    this.winnerLimitTotal = winnerLimitTotal;
+    this.winnerLimitPerDay = winnerLimitPerDay;
+    this.targetOrder = targetOrder;
+    this.nthScope = nthScope;
+    this.userLimitTotal = userLimitTotal;
+    this.userLimitPerDay = userLimitPerDay;
+    if (rewardType != null) {
+      this.rewardType = rewardType;
+    }
+    this.rewardValue = rewardValue;
+  }
 }

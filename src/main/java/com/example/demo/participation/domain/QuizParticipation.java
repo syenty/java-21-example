@@ -75,4 +75,43 @@ public class QuizParticipation {
     this.correctCount = correctCount;
     this.totalQuestions = totalQuestions;
   }
+
+  public void changeEvent(Event event) {
+    this.event = event;
+  }
+
+  public void changeUser(User user) {
+    this.user = user;
+  }
+
+  public void update(
+      Instant participationDt,
+      LocalDate participationDate,
+      Integer dailyOrder,
+      Boolean correct,
+      Integer score,
+      Integer correctCount,
+      Integer totalQuestions) {
+    if (participationDt != null) {
+      this.participationDt = participationDt;
+    }
+    if (participationDate != null) {
+      this.participationDate = participationDate;
+    }
+    if (dailyOrder != null) {
+      this.dailyOrder = dailyOrder;
+    }
+    if (correct != null) {
+      this.correct = correct;
+    }
+    if (score != null) {
+      this.score = score;
+    }
+    if (correctCount != null) {
+      this.correctCount = correctCount;
+    }
+    if (totalQuestions != null) {
+      this.totalQuestions = totalQuestions;
+    }
+  }
 }

@@ -59,4 +59,20 @@ public class QuizOption {
   public void markAsIncorrect() {
     this.correct = false;
   }
+
+  public void changeQuiz(Quiz quiz) {
+    this.quiz = quiz;
+  }
+
+  public void update(
+      String optionKey, String optionText, Boolean correct, Integer optionOrder) {
+    this.optionKey = optionKey;
+    this.optionText = optionText;
+    if (correct != null) {
+      this.correct = correct;
+    }
+    if (optionOrder != null) {
+      this.optionOrder = optionOrder;
+    }
+  }
 }

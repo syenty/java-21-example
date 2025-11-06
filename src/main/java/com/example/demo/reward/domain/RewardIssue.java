@@ -61,4 +61,29 @@ public class RewardIssue {
     this.rewardPolicy = rewardPolicy;
     this.rewardDate = rewardDate;
   }
+
+  public void update(LocalDate rewardDate, RewardPolicy rewardPolicy) {
+    if (rewardDate != null) {
+      this.rewardDate = rewardDate;
+    }
+    if (rewardPolicy != null) {
+      this.rewardPolicy = rewardPolicy;
+    }
+  }
+
+  public void changeEvent(Event event) {
+    this.event = event;
+  }
+
+  public void changeUser(User user) {
+    this.user = user;
+  }
+
+  public void changeParticipation(QuizParticipation participation) {
+    this.participation = participation;
+  }
+
+  public void changeRewardPolicy(RewardPolicy rewardPolicy) {
+    this.rewardPolicy = rewardPolicy;
+  }
 }

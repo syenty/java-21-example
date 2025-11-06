@@ -65,6 +65,25 @@ public class Event extends BaseTimeEntity {
     this.endDt = endDt;
   }
 
+  public void updateDetail(
+      String name,
+      String description,
+      LocalDateTime startDt,
+      LocalDateTime endDt,
+      Integer maxDailyTry,
+      EventStatus status) {
+    this.name = name;
+    this.description = description;
+    this.startDt = startDt;
+    this.endDt = endDt;
+    if (maxDailyTry != null && maxDailyTry > 0) {
+      this.maxDailyTry = maxDailyTry;
+    }
+    if (status != null) {
+      this.status = status;
+    }
+  }
+
   public void changeStatus(EventStatus status) {
     this.status = status;
   }

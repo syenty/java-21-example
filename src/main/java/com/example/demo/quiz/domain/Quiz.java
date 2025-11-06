@@ -74,4 +74,27 @@ public class Quiz {
   public void deactivate() {
     this.active = false;
   }
+
+  public void changeEvent(Event event) {
+    this.event = event;
+  }
+
+  public void update(
+      QuizType type,
+      String questionText,
+      String correctText,
+      Integer questionOrder,
+      Boolean active) {
+    if (type != null) {
+      this.type = type;
+    }
+    this.questionText = questionText;
+    this.correctText = correctText;
+    if (questionOrder != null) {
+      this.questionOrder = questionOrder;
+    }
+    if (active != null) {
+      this.active = active;
+    }
+  }
 }

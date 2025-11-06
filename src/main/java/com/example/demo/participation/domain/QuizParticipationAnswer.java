@@ -59,4 +59,23 @@ public class QuizParticipationAnswer {
     this.correct = correct;
     this.answeredDt = answeredDt;
   }
+
+  public void update(String answerText, Boolean correct, Instant answeredDt, QuizOption option) {
+    this.answerText = answerText;
+    if (correct != null) {
+      this.correct = correct;
+    }
+    if (answeredDt != null) {
+      this.answeredDt = answeredDt;
+    }
+    this.option = option;
+  }
+
+  public void changeParticipation(QuizParticipation participation) {
+    this.participation = participation;
+  }
+
+  public void changeQuiz(Quiz quiz) {
+    this.quiz = quiz;
+  }
 }
