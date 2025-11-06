@@ -96,32 +96,32 @@ CREATE TABLE reward_policy (
     start_dt            DATETIME NOT NULL,
     end_dt              DATETIME NOT NULL,
 
-    ------------------------------------------------------------------
-    -- [선착순(FIRST_COME) 관련 필드]
-    --  - 선착순 N명: winner_limit_total = 100 (이벤트 전체 기준)
-    --  - 매일 선착순 N명: winner_limit_per_day = 100
-    ------------------------------------------------------------------
+    /*
+     * [선착순(FIRST_COME) 관련 필드]
+     *  - 선착순 N명: winner_limit_total = 100 (이벤트 전체 기준)
+     *  - 매일 선착순 N명: winner_limit_per_day = 100
+     */
     winner_limit_total   INT NULL,  -- 정책 전체 기간 동안 최대 당첨 인원 수
     winner_limit_per_day INT NULL,  -- 날짜(KST) 기준 최대 당첨 인원 수
 
-    ------------------------------------------------------------------
-    -- [특정 순번(NTH_ORDER) 관련 필드]
-    --  - target_order = 5  => 5번째 참여자
-    --  - nth_scope = 'PER_DAY'   => 매일 5번째
-    --  - nth_scope = 'EVENT'     => 이벤트 전체 기간 동안 한 번만 5번째
-    ------------------------------------------------------------------
+    /*
+     * [특정 순번(NTH_ORDER) 관련 필드]
+     *  - target_order = 5  => 5번째 참여자
+     *  - nth_scope = 'PER_DAY'   => 매일 5번째
+     *  - nth_scope = 'EVENT'     => 이벤트 전체 기간 동안 한 번만 5번째
+     */
     target_order         INT NULL,  -- 5, 10 같은 자연수 (N번째)
     nth_scope            ENUM('PER_DAY','EVENT') NULL,
 
-    ------------------------------------------------------------------
-    -- [유저별 중복 당첨 제한] (UNIQUE로 막지 않고, 로직에서 COUNT로 체크)
-    ------------------------------------------------------------------
+    /*
+     * [유저별 중복 당첨 제한] (UNIQUE로 막지 않고, 로직에서 COUNT로 체크)
+     */
     user_limit_total     INT NULL,  -- 이 정책으로 한 유저가 최대 몇 번까지 당첨 가능
     user_limit_per_day   INT NULL,  -- 하루 기준 최대 당첨 횟수
 
-    ------------------------------------------------------------------
-    -- [지급 내용]
-    ------------------------------------------------------------------
+    /*
+     * [지급 내용]
+     */
     reward_type          ENUM('POINT','COUPON','GOODS') NOT NULL,
     reward_value         VARCHAR(200) NOT NULL, -- 포인트값/쿠폰코드/상품코드 등
 
