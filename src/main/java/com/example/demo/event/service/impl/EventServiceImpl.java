@@ -31,12 +31,17 @@ public class EventServiceImpl implements EventService {
   @Override
   @Transactional
   public EventResponse create(EventRequest request) {
+    if (request.participationStartTime() == null || request.participationEndTime() == null) {
+      throw new IllegalArgumentException("참여 가능 시간은 반드시 입력되어야 합니다.");
+    }
     Event event =
         Event.builder()
             .name(request.name())
             .description(request.description())
             .startDt(request.startDt())
             .endDt(request.endDt())
+            .participationStartTime(request.participationStartTime())
+            .participationEndTime(request.participationEndTime())
             .maxDailyTry(
                 request.maxDailyTry() != null && request.maxDailyTry() > 0
                     ? request.maxDailyTry()
@@ -60,6 +65,8 @@ public class EventServiceImpl implements EventService {
                   request.description(),
                   request.startDt(),
                   request.endDt(),
+                  request.participationStartTime(),
+                  request.participationEndTime(),
                   request.maxDailyTry(),
                   request.status());
               return EventResponse.of(event);

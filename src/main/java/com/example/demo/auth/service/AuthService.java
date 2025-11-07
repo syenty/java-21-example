@@ -1,8 +1,10 @@
 package com.example.demo.auth.service;
 
+import com.example.demo.common.auth.dto.EventAttendanceLoginRequest;
 import com.example.demo.common.auth.dto.LoginRequest;
 import com.example.demo.common.auth.dto.TokenResponse;
 import com.example.demo.common.auth.dto.UserEmployeeLoginRequest;
+import com.example.demo.event.service.EventAttendanceService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.service.UserService;
 import com.example.demo.common.jwt.JwtTokenProvider;
@@ -19,31 +21,49 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
+  private final AuthenticationManagerBuilder authenticationManagerBuilder;
+  private final JwtTokenProvider jwtTokenProvider;
+  private final UserService userService;
+  private final EventAttendanceService eventAttendanceService;
 
-    public TokenResponse login(LoginRequest loginRequest) {
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+  public TokenResponse adminLogin(LoginRequest loginRequest) {
+    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+        loginRequest.getEmail(), loginRequest.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+    Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        String accessToken = jwtTokenProvider.createToken(authentication);
-        return new TokenResponse(accessToken);
+    String accessToken = jwtTokenProvider.createToken(authentication);
+    return new TokenResponse(accessToken);
+  }
+
+  public TokenResponse userLogin(UserEmployeeLoginRequest request) {
+    User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
+        .orElseThrow(() -> new IllegalArgumentException("User not found for provided credentials"));
+
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+        user.getExternalId(),
+        null,
+        List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+    String accessToken = jwtTokenProvider.createToken(authentication);
+    return new TokenResponse(accessToken);
+  }
+
+  public TokenResponse eventAttendanceLogin(EventAttendanceLoginRequest request) {
+    if (request.getEventId() == null) {
+      throw new IllegalArgumentException("eventId is required for attendance.");
     }
+    User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
+        .orElseThrow(() -> new IllegalArgumentException("User not found for provided credentials"));
 
-    public TokenResponse userLogin(UserEmployeeLoginRequest request) {
-        User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
-                .orElseThrow(() -> new IllegalArgumentException("User not found for provided credentials"));
+    eventAttendanceService.attend(request.getEventId(), user.getId());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user.getExternalId(),
-                null,
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+        user.getExternalId(),
+        null,
+        List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-        String accessToken = jwtTokenProvider.createToken(authentication);
-        return new TokenResponse(accessToken);
-    }
+    String accessToken = jwtTokenProvider.createToken(authentication);
+    return new TokenResponse(accessToken);
+  }
 }

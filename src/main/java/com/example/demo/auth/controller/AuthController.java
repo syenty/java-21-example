@@ -2,6 +2,7 @@ package com.example.demo.auth.controller;
 
 import com.example.demo.auth.service.AuthService;
 import com.example.demo.common.auth.dto.LoginRequest;
+import com.example.demo.common.auth.dto.EventAttendanceLoginRequest;
 import com.example.demo.common.auth.dto.TokenResponse;
 import com.example.demo.common.auth.dto.UserEmployeeLoginRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,17 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/admin-login")
-  public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest) {
-    return ResponseEntity.ok(authService.login(loginRequest));
+  public ResponseEntity<TokenResponse> adminLogin(@RequestBody LoginRequest loginRequest) {
+    return ResponseEntity.ok(authService.adminLogin(loginRequest));
   }
 
   @PostMapping("/user-login")
-  public ResponseEntity<TokenResponse> userLogin(@RequestBody UserEmployeeLoginRequest request) {
-    return ResponseEntity.ok(authService.userLogin(request));
-  }
+    public ResponseEntity<TokenResponse> userLogin(@RequestBody UserEmployeeLoginRequest request) {
+        return ResponseEntity.ok(authService.userLogin(request));
+    }
+
+    @PostMapping("/event-login")
+    public ResponseEntity<TokenResponse> eventAttendanceLogin(@RequestBody EventAttendanceLoginRequest request) {
+        return ResponseEntity.ok(authService.eventAttendanceLogin(request));
+    }
 }
