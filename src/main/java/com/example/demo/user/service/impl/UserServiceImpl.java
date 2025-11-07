@@ -6,6 +6,7 @@ import com.example.demo.user.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,40 +15,47 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepository repository;
+  private final UserRepository repository;
 
-    @Override
-    public List<User> getAll() {
-        return repository.findAll();
-    }
+  @Override
+  public List<User> getAll() {
+    return repository.findAll();
+  }
 
-    @Override
-    public Optional<User> getById(Long id) {
-        return repository.findById(id);
-    }
+  @Override
+  public Optional<User> getById(Long id) {
+    return repository.findById(id);
+  }
 
-    @Override
-    public User create(User user) {
-        User toSave = User.builder()
-                .name(user.getName())
-                .phoneNumber(user.getPhoneNumber())
-                .organizationCode(user.getOrganizationCode())
-                .build();
-        return repository.save(toSave);
-    }
+  @Override
+  public Optional<User> getByExternalId(String externalId) {
+    return repository.findByExternalId(externalId);
+  }
 
-    @Override
-    public Optional<User> update(Long id, User user) {
-        return repository.findById(id).map(existing -> {
-            existing.update(user.getName(), user.getPhoneNumber(), user.getOrganizationCode());
-            return repository.save(existing);
-        });
-    }
+  @Override
+  public User create(User user) {
+    User toSave = User.builder()
+        .name(user.getName())
+        .phoneNumber(user.getPhoneNumber())
+        .employeeNumber(user.getEmployeeNumber())
+        .externalId(UUID.randomUUID().toString())
+        .build();
+    return repository.save(toSave);
+  }
 
-    @Override
-    public boolean delete(Long id) {
-        if (!repository.existsById(id)) return false;
-        repository.deleteById(id);
-        return true;
-    }
+  @Override
+  public Optional<User> update(Long id, User user) {
+    return repository.findById(id).map(existing -> {
+      existing.update(user.getName(), user.getPhoneNumber(), user.getEmployeeNumber());
+      return repository.save(existing);
+    });
+  }
+
+  @Override
+  public boolean delete(Long id) {
+    if (!repository.existsById(id))
+      return false;
+    repository.deleteById(id);
+    return true;
+  }
 }
