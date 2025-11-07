@@ -33,6 +33,9 @@ public class QuizServiceImpl implements QuizService {
   @Override
   @Transactional
   public Optional<QuizResponse> create(QuizRequest request) {
+    if (request.quizDate() == null) {
+      throw new IllegalArgumentException("quizDate is required");
+    }
     return eventRepository
         .findById(request.eventId())
         .map(
@@ -43,6 +46,7 @@ public class QuizServiceImpl implements QuizService {
                       .type(request.type())
                       .questionText(request.questionText())
                       .correctText(request.correctText())
+                      .quizDate(request.quizDate())
                       .questionOrder(
                           request.questionOrder() != null ? request.questionOrder() : 1)
                       .active(request.active() != null ? request.active() : true)
@@ -71,6 +75,7 @@ public class QuizServiceImpl implements QuizService {
                             request.type(),
                             request.questionText(),
                             request.correctText(),
+                            request.quizDate(),
                             request.questionOrder(),
                             request.active());
                         return QuizResponse.of(quiz);
