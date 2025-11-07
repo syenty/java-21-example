@@ -10,6 +10,8 @@ import com.example.demo.participation.service.QuizParticipationService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class QuizParticipationServiceImpl implements QuizParticipationService {
+
+  private static final ZoneId ZONE_ID = ZoneId.of("Asia/Seoul");
 
   private final QuizParticipationRepository participationRepository;
   private final EventRepository eventRepository;
@@ -40,37 +44,51 @@ public class QuizParticipationServiceImpl implements QuizParticipationService {
   @Override
   @Transactional
   public Optional<QuizParticipationResponse> create(QuizParticipationRequest request) {
+    if (request.correct() == null || !request.correct()) {
+      throw new IllegalStateException("정답을 맞춘 경우에만 참여가 인정됩니다.");
+    }
     return eventRepository
         .findById(request.eventId())
         .flatMap(
-            event ->
-                userRepository
-                    .findById(request.userId())
-                    .map(
-                        user -> {
-                          QuizParticipation participation =
-                              QuizParticipation.builder()
-                                  .event(event)
-                                  .user(user)
-                                  .participationDt(
-                                      request.participationDt() != null
-                                          ? request.participationDt()
-                                          : Instant.now())
-                                  .participationDate(request.participationDate())
-                                  .dailyOrder(
-                                      request.dailyOrder() != null ? request.dailyOrder() : 1)
-                                  .correct(request.correct() != null && request.correct())
-                                  .score(request.score() != null ? request.score() : 0)
-                                  .correctCount(
-                                      request.correctCount() != null ? request.correctCount() : 0)
-                                  .totalQuestions(
-                                      request.totalQuestions() != null
-                                          ? request.totalQuestions()
-                                          : 0)
-                                  .build();
-                          return QuizParticipationResponse.of(
-                              participationRepository.save(participation));
-                        }));
+            event -> userRepository
+                .findById(request.userId())
+                .map(
+                    user -> {
+                      Instant participationInstant = request.participationDt() != null
+                          ? request.participationDt()
+                          : Instant.now();
+                      LocalDate participationDate = request.participationDate() != null
+                          ? request.participationDate()
+                          : LocalDate.now(ZONE_ID);
+
+                      if (!event.isWithinParticipationWindow(participationInstant, ZONE_ID)) {
+                        throw new IllegalStateException("지정된 참여 시간이 아닙니다.");
+                      }
+
+                      if (participationRepository.existsByEvent_IdAndUser_IdAndParticipationDate(
+                          event.getId(), user.getId(), participationDate)) {
+                        throw new IllegalStateException("이미 퀴즈를 참여했습니다.");
+                      }
+
+                      QuizParticipation participation = QuizParticipation.builder()
+                          .event(event)
+                          .user(user)
+                          .participationDt(participationInstant)
+                          .participationDate(participationDate)
+                          .dailyOrder(
+                              request.dailyOrder() != null ? request.dailyOrder() : 1)
+                          .correct(request.correct() != null && request.correct())
+                          .score(request.score() != null ? request.score() : 0)
+                          .correctCount(
+                              request.correctCount() != null ? request.correctCount() : 0)
+                          .totalQuestions(
+                              request.totalQuestions() != null
+                                  ? request.totalQuestions()
+                                  : 0)
+                          .build();
+                      return QuizParticipationResponse.of(
+                          participationRepository.save(participation));
+                    }));
   }
 
   @Override

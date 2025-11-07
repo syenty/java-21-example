@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class UserEmployeeLoginRequest {
-    private String employeeNumber;
-    private String name;
+  private String employeeNumber;
+  private String name;
+  private Long eventId;
 }

@@ -4,6 +4,7 @@ import com.example.demo.event.domain.Event;
 import com.example.demo.event.domain.EventStatus;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public record EventResponse(
     Long id,
@@ -11,6 +12,8 @@ public record EventResponse(
     String description,
     LocalDateTime startDt,
     LocalDateTime endDt,
+    LocalTime participationStartTime,
+    LocalTime participationEndTime,
     int maxDailyTry,
     EventStatus status,
     Instant createdDt,
@@ -23,6 +26,8 @@ public record EventResponse(
         event.getDescription(),
         event.getStartDt(),
         event.getEndDt(),
+        event.getParticipationStartTime(),
+        event.getParticipationEndTime(),
         event.getMaxDailyTry(),
         event.getStatus(),
         event.getCreatedDt(),
