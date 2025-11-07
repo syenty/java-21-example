@@ -6,6 +6,7 @@ import com.example.demo.participation.domain.QuizParticipation;
 import com.example.demo.participation.repository.QuizParticipationRepository;
 import com.example.demo.reward.domain.RewardIssue;
 import com.example.demo.reward.domain.RewardPolicy;
+import com.example.demo.reward.domain.RewardPolicyType;
 import com.example.demo.reward.dto.RewardIssueRequest;
 import com.example.demo.reward.dto.RewardIssueResponse;
 import com.example.demo.reward.repository.RewardIssueRepository;
@@ -13,6 +14,7 @@ import com.example.demo.reward.repository.RewardPolicyRepository;
 import com.example.demo.reward.service.RewardIssueService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -127,5 +129,50 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     }
     rewardIssueRepository.deleteById(id);
     return true;
+  }
+
+  @Override
+  @Transactional
+  public Optional<RewardIssueResponse> decideAndIssue(
+      List<RewardPolicy> policies, QuizParticipation participation, LocalDate rewardDate) {
+    if (policies == null || policies.isEmpty()) {
+      return Optional.empty();
+    }
+    for (RewardPolicy policy : policies) {
+      if (policy.getPolicyType() == RewardPolicyType.NTH_ORDER) {
+        Optional<RewardIssueResponse> issued =
+            issueNthOrder(policy, participation, rewardDate);
+        if (issued.isPresent()) {
+          return issued;
+        }
+      }
+    }
+    return Optional.empty();
+  }
+
+  private Optional<RewardIssueResponse> issueNthOrder(
+      RewardPolicy policy, QuizParticipation participation, LocalDate rewardDate) {
+    Integer targetOrder = policy.getTargetOrder();
+    if (targetOrder == null) {
+      return Optional.empty();
+    }
+
+    long order =
+        participationRepository.countByEvent_IdAndIdLessThanEqual(
+            participation.getEvent().getId(), participation.getId());
+    if (order != targetOrder) {
+      return Optional.empty();
+    }
+
+    RewardIssue issue =
+        RewardIssue.builder()
+            .event(participation.getEvent())
+            .user(participation.getUser())
+            .participation(participation)
+            .rewardPolicy(policy)
+            .rewardDate(rewardDate)
+            .build();
+
+    return Optional.of(RewardIssueResponse.of(rewardIssueRepository.save(issue)));
   }
 }

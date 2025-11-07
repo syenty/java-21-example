@@ -6,6 +6,9 @@ import com.example.demo.reward.dto.RewardPolicyRequest;
 import com.example.demo.reward.dto.RewardPolicyResponse;
 import com.example.demo.reward.repository.RewardPolicyRepository;
 import com.example.demo.reward.service.RewardPolicyService;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -112,5 +115,12 @@ public class RewardPolicyServiceImpl implements RewardPolicyService {
     }
     rewardPolicyRepository.deleteById(id);
     return true;
+  }
+
+  @Override
+  public List<RewardPolicy> findActivePolicies(Long eventId, Instant utcNow) {
+    LocalDateTime now = LocalDateTime.ofInstant(utcNow, ZoneOffset.UTC);
+    return rewardPolicyRepository.findByEvent_IdAndStartDtLessThanEqualAndEndDtGreaterThanEqual(
+        eventId, now, now);
   }
 }

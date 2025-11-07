@@ -1,7 +1,9 @@
 package com.example.demo.reward.service;
 
+import com.example.demo.reward.domain.RewardPolicy;
 import com.example.demo.reward.dto.RewardPolicyRequest;
 import com.example.demo.reward.dto.RewardPolicyResponse;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,4 +17,6 @@ public interface RewardPolicyService {
   Optional<RewardPolicyResponse> update(Long id, RewardPolicyRequest request);
 
   boolean delete(Long id);
+
+  List<RewardPolicy> findActivePolicies(Long eventId, Instant utcNow);
 }
