@@ -1,5 +1,6 @@
 package com.example.demo.auth.service;
 
+import com.example.demo.common.auth.dto.EventAttendanceLoginRequest;
 import com.example.demo.common.auth.dto.LoginRequest;
 import com.example.demo.common.auth.dto.TokenResponse;
 import com.example.demo.common.auth.dto.UserEmployeeLoginRequest;
@@ -36,6 +37,19 @@ public class AuthService {
   }
 
   public TokenResponse userLogin(UserEmployeeLoginRequest request) {
+    User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
+        .orElseThrow(() -> new IllegalArgumentException("User not found for provided credentials"));
+
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+        user.getExternalId(),
+        null,
+        List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+    String accessToken = jwtTokenProvider.createToken(authentication);
+    return new TokenResponse(accessToken);
+  }
+
+  public TokenResponse eventAttendanceLogin(EventAttendanceLoginRequest request) {
     if (request.getEventId() == null) {
       throw new IllegalArgumentException("eventId is required for attendance.");
     }
