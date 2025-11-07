@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +43,9 @@ public class Quiz {
   private String correctText;
 
   @Column(nullable = false)
+  private LocalDate quizDate;
+
+  @Column(nullable = false)
   private int questionOrder;
 
   @Column(nullable = false)
@@ -57,12 +61,14 @@ public class Quiz {
       final QuizType type,
       final String questionText,
       final String correctText,
+      final LocalDate quizDate,
       final int questionOrder,
       final boolean active) {
     this.event = event;
     this.type = type;
     this.questionText = questionText;
     this.correctText = correctText;
+    this.quizDate = quizDate;
     this.questionOrder = questionOrder;
     this.active = active;
   }
@@ -83,6 +89,7 @@ public class Quiz {
       QuizType type,
       String questionText,
       String correctText,
+      LocalDate quizDate,
       Integer questionOrder,
       Boolean active) {
     if (type != null) {
@@ -90,6 +97,9 @@ public class Quiz {
     }
     this.questionText = questionText;
     this.correctText = correctText;
+    if (quizDate != null) {
+      this.quizDate = quizDate;
+    }
     if (questionOrder != null) {
       this.questionOrder = questionOrder;
     }

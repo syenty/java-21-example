@@ -34,7 +34,8 @@ public final class Endpoint {
 
   public static final Map<String, String[]> USER_URLS = Map.ofEntries(
       Map.entry("/api/users", new String[] { "GET", "POST" }),
-      Map.entry("/api/users/{id}", new String[] { "GET", "PUT", "DELETE" }));
+      Map.entry("/api/users/{id}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/event-participations", new String[] { "POST" }));
 
   public static String[] urlPatternsFor(Map<String, String[]> endpointMap) {
     return endpointMap.keySet().toArray(new String[0]);

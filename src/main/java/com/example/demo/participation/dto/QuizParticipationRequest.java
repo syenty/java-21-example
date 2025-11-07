@@ -1,15 +1,8 @@
 package com.example.demo.participation.dto;
 
-import java.time.Instant;
-import java.time.LocalDate;
+import java.util.List;
 
-public record QuizParticipationRequest(
-    Long eventId,
-    Long userId,
-    Instant participationDt,
-    LocalDate participationDate,
-    Integer dailyOrder,
-    Boolean correct,
-    Integer score,
-    Integer correctCount,
-    Integer totalQuestions) {}
+public record QuizParticipationRequest(Long eventId, Long userId, List<QuizAnswer> answers) {
+
+  public record QuizAnswer(Long quizId, Long optionId, String answerText) {}
+}

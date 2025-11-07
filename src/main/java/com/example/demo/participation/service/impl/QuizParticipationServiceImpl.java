@@ -7,6 +7,7 @@ import com.example.demo.participation.dto.QuizParticipationRequest;
 import com.example.demo.participation.dto.QuizParticipationResponse;
 import com.example.demo.participation.repository.QuizParticipationRepository;
 import com.example.demo.participation.service.QuizParticipationService;
+import com.example.demo.quiz.service.QuizService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
 import java.time.Instant;
@@ -28,6 +29,7 @@ public class QuizParticipationServiceImpl implements QuizParticipationService {
   private final QuizParticipationRepository participationRepository;
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
+  private final QuizService quizService;
 
   @Override
   public List<QuizParticipationResponse> findAll() {
@@ -44,8 +46,8 @@ public class QuizParticipationServiceImpl implements QuizParticipationService {
   @Override
   @Transactional
   public Optional<QuizParticipationResponse> create(QuizParticipationRequest request) {
-    if (request.correct() == null || !request.correct()) {
-      throw new IllegalStateException("정답을 맞춘 경우에만 참여가 인정됩니다.");
+    if (!quizService.areAllAnswersCorrect(request.eventId(), request.answers())) {
+      throw new IllegalStateException("모든 퀴즈 정답을 맞춰야 참여가 인정됩니다.");
     }
     return eventRepository
         .findById(request.eventId())
@@ -54,12 +56,8 @@ public class QuizParticipationServiceImpl implements QuizParticipationService {
                 .findById(request.userId())
                 .map(
                     user -> {
-                      Instant participationInstant = request.participationDt() != null
-                          ? request.participationDt()
-                          : Instant.now();
-                      LocalDate participationDate = request.participationDate() != null
-                          ? request.participationDate()
-                          : LocalDate.now(ZONE_ID);
+                      Instant participationInstant = Instant.now();
+                      LocalDate participationDate = LocalDate.now(ZONE_ID);
 
                       if (!event.isWithinParticipationWindow(participationInstant, ZONE_ID)) {
                         throw new IllegalStateException("지정된 참여 시간이 아닙니다.");
@@ -75,16 +73,11 @@ public class QuizParticipationServiceImpl implements QuizParticipationService {
                           .user(user)
                           .participationDt(participationInstant)
                           .participationDate(participationDate)
-                          .dailyOrder(
-                              request.dailyOrder() != null ? request.dailyOrder() : 1)
-                          .correct(request.correct() != null && request.correct())
-                          .score(request.score() != null ? request.score() : 0)
-                          .correctCount(
-                              request.correctCount() != null ? request.correctCount() : 0)
-                          .totalQuestions(
-                              request.totalQuestions() != null
-                                  ? request.totalQuestions()
-                                  : 0)
+                          .dailyOrder(1)
+                          .correct(true)
+                          .score(0)
+                          .correctCount(request.answers() != null ? request.answers().size() : 0)
+                          .totalQuestions(request.answers() != null ? request.answers().size() : 0)
                           .build();
                       return QuizParticipationResponse.of(
                           participationRepository.save(participation));
@@ -114,14 +107,7 @@ public class QuizParticipationServiceImpl implements QuizParticipationService {
                 }
                 participation.changeUser(userOpt.get());
               }
-              participation.update(
-                  request.participationDt(),
-                  request.participationDate(),
-                  request.dailyOrder(),
-                  request.correct(),
-                  request.score(),
-                  request.correctCount(),
-                  request.totalQuestions());
+              // no mutable fields from request anymore
               return Optional.of(QuizParticipationResponse.of(participation));
             });
   }
