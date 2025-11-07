@@ -29,6 +29,13 @@ public class UserController {
         .orElse(ResponseEntity.notFound().build());
   }
 
+  @GetMapping("/external/{externalId}")
+  public ResponseEntity<User> getByExternalId(@PathVariable String externalId) {
+    return service.getByExternalId(externalId)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+  }
+
   @PostMapping
   public ResponseEntity<User> create(@RequestBody User user) {
     User created = service.create(user);

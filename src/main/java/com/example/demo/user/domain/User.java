@@ -28,19 +28,27 @@ public class User extends BaseTimeEntity {
   @Column(name = "phone_number", nullable = false, unique = true)
   private String phoneNumber;
 
-  @Column(name = "organization_code", nullable = false)
-  private String organizationCode;
+  @Column(nullable = false)
+  private String employeeNumber;
 
-  public void update(String name, String phoneNumber, String organizationCode) {
+  @Column(name = "external_id", nullable = false, unique = true)
+  private String externalId;
+
+  public void update(String name, String phoneNumber, String employeeNumber) {
     this.name = name;
     this.phoneNumber = phoneNumber;
-    this.organizationCode = organizationCode;
+    this.employeeNumber = employeeNumber;
   }
 
   @Builder
-  private User(final String name, final String phoneNumber, final String organizationCode) {
+  private User(
+      final String name,
+      final String phoneNumber,
+      final String employeeNumber,
+      final String externalId) {
     this.name = name;
     this.phoneNumber = phoneNumber;
-    this.organizationCode = organizationCode;
+    this.employeeNumber = employeeNumber;
+    this.externalId = externalId;
   }
 }
