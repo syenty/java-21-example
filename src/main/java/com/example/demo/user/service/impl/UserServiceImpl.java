@@ -28,9 +28,14 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> getByExternalId(String externalId) {
-    return repository.findByExternalId(externalId);
-  }
+    public Optional<User> getByExternalId(String externalId) {
+        return repository.findByExternalId(externalId);
+    }
+
+    @Override
+    public Optional<User> getByEmployeeNumberAndName(String employeeNumber, String name) {
+        return repository.findByEmployeeNumberAndName(employeeNumber, name);
+    }
 
   @Override
   public User create(User user) {

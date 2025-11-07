@@ -23,7 +23,8 @@ public final class Endpoint {
       Map.entry("/swagger-ui/*", new String[] { "GET" }),
       Map.entry("/swagger-ui.html", new String[] { "GET" }),
       Map.entry("/webjars/swagger-ui/*", new String[] { "GET" }),
-      Map.entry("/api/auth/login", new String[] { "POST" }));
+      Map.entry("/api/auth/admin-login", new String[] { "POST" }),
+      Map.entry("/api/auth/user-login", new String[] { "POST" }));
 
   public static final Map<String, String[]> ADMIN_URLS = Map.ofEntries(
       Map.entry("/api/admins", new String[] { "GET", "POST" }), // 전체 조회, 생성
