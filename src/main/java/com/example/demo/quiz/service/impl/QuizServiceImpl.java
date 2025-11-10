@@ -4,14 +4,21 @@ import com.example.demo.event.repository.EventRepository;
 import com.example.demo.participation.dto.QuizParticipationRequest;
 import com.example.demo.quiz.domain.Quiz;
 import com.example.demo.quiz.domain.QuizOption;
+import com.example.demo.quiz.dto.QuizAdminResponse;
+import com.example.demo.quiz.dto.QuizOptionResponse;
+import com.example.demo.quiz.dto.QuizOptionUserResponse;
 import com.example.demo.quiz.dto.QuizRequest;
-import com.example.demo.quiz.dto.QuizResponse;
+import com.example.demo.quiz.dto.QuizUserResponse;
 import com.example.demo.quiz.repository.QuizOptionRepository;
 import com.example.demo.quiz.repository.QuizRepository;
 import com.example.demo.quiz.service.QuizService;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,23 +28,30 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class QuizServiceImpl implements QuizService {
 
+  private static final ZoneId DEFAULT_ZONE_ID = ZoneId.of("Asia/Seoul");
   private final QuizRepository quizRepository;
   private final EventRepository eventRepository;
   private final QuizOptionRepository quizOptionRepository;
 
   @Override
-  public List<QuizResponse> findAll() {
-    return quizRepository.findAll().stream().map(QuizResponse::of).toList();
+  public List<QuizAdminResponse> findAll() {
+    List<Quiz> quizzes = quizRepository.findAll();
+    Map<Long, List<QuizOptionResponse>> optionMap = groupAdminOptionsByQuizIds(quizzes);
+    return quizzes.stream()
+        .map(quiz -> QuizAdminResponse.of(quiz, optionMap.getOrDefault(quiz.getId(), List.of())))
+        .toList();
   }
 
   @Override
-  public Optional<QuizResponse> findById(Long id) {
-    return quizRepository.findById(id).map(QuizResponse::of);
+  public Optional<QuizAdminResponse> findById(Long id) {
+    return quizRepository
+        .findById(id)
+        .map(quiz -> QuizAdminResponse.of(quiz, loadAdminOptions(quiz.getId())));
   }
 
   @Override
   @Transactional
-  public Optional<QuizResponse> create(QuizRequest request) {
+  public Optional<QuizAdminResponse> create(QuizRequest request) {
     if (request.quizDate() == null) {
       throw new IllegalArgumentException("quizDate is required");
     }
@@ -45,30 +59,29 @@ public class QuizServiceImpl implements QuizService {
         .findById(request.eventId())
         .map(
             event -> {
-              Quiz quiz =
-                  Quiz.builder()
-                      .event(event)
-                      .type(request.type())
-                      .questionText(request.questionText())
-                      .correctText(request.correctText())
-                      .quizDate(request.quizDate())
-                      .questionOrder(
-                          request.questionOrder() != null ? request.questionOrder() : 1)
-                      .active(request.active() != null ? request.active() : true)
-                      .build();
-              return QuizResponse.of(quizRepository.save(quiz));
+              Quiz quiz = Quiz.builder()
+                  .event(event)
+                  .type(request.type())
+                  .questionText(request.questionText())
+                  .correctText(request.correctText())
+                  .quizDate(request.quizDate())
+                  .questionOrder(
+                      request.questionOrder() != null ? request.questionOrder() : 1)
+                  .active(request.active() != null ? request.active() : true)
+                  .build();
+              Quiz saved = quizRepository.save(quiz);
+              return QuizAdminResponse.of(saved, Collections.emptyList());
             });
   }
 
   @Override
   @Transactional
-  public Optional<QuizResponse> update(Long id, QuizRequest request) {
+  public Optional<QuizAdminResponse> update(Long id, QuizRequest request) {
     return quizRepository
         .findById(id)
         .flatMap(
             quiz -> {
-              Long targetEventId =
-                  request.eventId() != null ? request.eventId() : quiz.getEvent().getId();
+              Long targetEventId = request.eventId() != null ? request.eventId() : quiz.getEvent().getId();
               return eventRepository
                   .findById(targetEventId)
                   .map(
@@ -83,7 +96,7 @@ public class QuizServiceImpl implements QuizService {
                             request.quizDate(),
                             request.questionOrder(),
                             request.active());
-                        return QuizResponse.of(quiz);
+                        return QuizAdminResponse.of(quiz, loadAdminOptions(quiz.getId()));
                       });
             });
   }
@@ -99,9 +112,50 @@ public class QuizServiceImpl implements QuizService {
   }
 
   @Override
-  public List<QuizResponse> findByEventAndDate(Long eventId, LocalDate quizDate) {
-    return quizRepository.findByEvent_IdAndQuizDateOrderByQuestionOrderAsc(eventId, quizDate).stream()
-        .map(QuizResponse::of)
+  public List<QuizUserResponse> findByEventAndDate(Long eventId, LocalDate quizDate) {
+    List<Quiz> quizzes = quizRepository.findByEvent_IdAndQuizDateOrderByQuestionOrderAsc(eventId, quizDate);
+    Map<Long, List<QuizOptionUserResponse>> optionMap = groupUserOptionsByQuizIds(quizzes);
+    return quizzes.stream()
+        .map(quiz -> QuizUserResponse.of(quiz, optionMap.getOrDefault(quiz.getId(), List.of())))
+        .toList();
+  }
+
+  @Override
+  public List<QuizUserResponse> findTodayByEvent(Long eventId) {
+    LocalDate today = LocalDate.now(DEFAULT_ZONE_ID);
+    return findByEventAndDate(eventId, today);
+  }
+
+  private Map<Long, List<QuizOptionResponse>> groupAdminOptionsByQuizIds(List<Quiz> quizzes) {
+    if (quizzes == null || quizzes.isEmpty()) {
+      return Collections.emptyMap();
+    }
+    List<Long> quizIds = quizzes.stream().map(Quiz::getId).toList();
+    return quizOptionRepository
+        .findByQuiz_IdInOrderByQuiz_IdAscOptionOrderAsc(quizIds)
+        .stream()
+        .map(QuizOptionResponse::of)
+        .collect(Collectors.groupingBy(QuizOptionResponse::quizId));
+  }
+
+  private Map<Long, List<QuizOptionUserResponse>> groupUserOptionsByQuizIds(List<Quiz> quizzes) {
+    if (quizzes == null || quizzes.isEmpty()) {
+      return Collections.emptyMap();
+    }
+    List<Long> quizIds = quizzes.stream().map(Quiz::getId).toList();
+    return quizOptionRepository
+        .findByQuiz_IdInOrderByQuiz_IdAscOptionOrderAsc(quizIds)
+        .stream()
+        .map(QuizOptionUserResponse::of)
+        .collect(Collectors.groupingBy(QuizOptionUserResponse::quizId));
+  }
+
+  private List<QuizOptionResponse> loadAdminOptions(Long quizId) {
+    if (quizId == null) {
+      return Collections.emptyList();
+    }
+    return quizOptionRepository.findByQuiz_IdOrderByOptionOrderAsc(quizId).stream()
+        .map(QuizOptionResponse::of)
         .toList();
   }
 
@@ -125,18 +179,16 @@ public class QuizServiceImpl implements QuizService {
         return false;
       }
 
-      Quiz quiz =
-          quizRepository
-              .findByIdAndEvent_Id(answer.quizId(), eventId)
-              .orElse(null);
+      Quiz quiz = quizRepository
+          .findByIdAndEvent_Id(answer.quizId(), eventId)
+          .orElse(null);
 
       if (quiz == null) {
         return false;
       }
 
       if (answer.optionId() != null) {
-        QuizOption option =
-            quizOptionRepository.findById(answer.optionId()).orElse(null);
+        QuizOption option = quizOptionRepository.findById(answer.optionId()).orElse(null);
         if (option == null || !option.getQuiz().getId().equals(quiz.getId()) || !option.isCorrect()) {
           return false;
         }

@@ -117,12 +117,12 @@ public class EventParticipationServiceImpl implements EventParticipationService 
             () -> EventDailySequence.builder()
                 .event(event)
                 .id(id)
-                .lastSequence(0)
+                .lastSeq(0)
                 .build());
 
-    sequence.updateLastSequence(sequence.getLastSequence() + 1);
+    sequence.updateLastSeq(sequence.getLastSeq() + 1);
     dailySequenceRepository.save(sequence);
-    return sequence.getLastSequence();
+    return sequence.getLastSeq();
   }
 
 }

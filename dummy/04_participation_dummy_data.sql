@@ -69,7 +69,7 @@ VALUES
 
 INSERT INTO quiz_participation
 (id, event_id, user_id, participation_dt, participation_date,
- daily_order, is_correct, score, correct_count, total_questions)
+ daily_order, correct, score, correct_count, total_questions)
 VALUES
 -- Day 1 (2025-11-07)
 (1,  1,  1, '2025-11-06 15:00:00', '2025-11-07', 1, 1, 100, 1, 1),
@@ -132,7 +132,7 @@ VALUES
 (50, 1, 47, '2025-11-10 15:09:00', '2025-11-11',10, 1, 100, 1, 1);
 
 INSERT INTO quiz_participation_answer
-(id, participation_id, quiz_id, option_id, answer_text, is_correct, answer_dt)
+(id, participation_id, quiz_id, option_id, answer_text, correct, answer_dt)
 VALUES
 -- Day 1 : quiz_id=1, option_id=1 (O)
 (1,  1, 1, 1, NULL, 1, '2025-11-06 15:00:10'),

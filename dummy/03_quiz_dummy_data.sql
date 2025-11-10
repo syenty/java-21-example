@@ -1,5 +1,5 @@
 -- quiz 더미 데이터
-INSERT INTO quiz (id, event_id, type, question_text, correct_text, question_order, is_active, created_dt, quiz_date) VALUES
+INSERT INTO quiz (id, event_id, type, question_text, correct_text, question_order, active, created_dt, quiz_date) VALUES
 (1,  1, 'OX', '2025-11-07 출석 퀴즈 (OX)', NULL, 1, 1, UTC_TIMESTAMP(), '20251107'),
 (2,  1, 'OX', '2025-11-08 출석 퀴즈 (OX)', NULL, 1, 1, UTC_TIMESTAMP(), '20251108'),
 (3,  1, 'OX', '2025-11-09 출석 퀴즈 (OX)', NULL, 1, 1, UTC_TIMESTAMP(), '20251109'),
@@ -32,7 +32,7 @@ INSERT INTO quiz (id, event_id, type, question_text, correct_text, question_orde
 (30, 1, 'OX', '2025-12-06 출석 퀴즈 (OX)', NULL, 1, 1, UTC_TIMESTAMP(), '20251206');
 
 -- quiz_option 더미 데이터
-INSERT INTO quiz_option (id, quiz_id, option_key, option_text, is_correct, option_order) VALUES
+INSERT INTO quiz_option (id, quiz_id, option_key, option_text, correct, option_order) VALUES
 (1,  1, 'O', 'O', 1, 1), (2,  1, 'X', 'X', 0, 2),
 (3,  2, 'O', 'O', 1, 1), (4,  2, 'X', 'X', 0, 2),
 (5,  3, 'O', 'O', 1, 1), (6,  3, 'X', 'X', 0, 2),

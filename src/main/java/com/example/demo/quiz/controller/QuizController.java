@@ -1,7 +1,8 @@
 package com.example.demo.quiz.controller;
 
+import com.example.demo.quiz.dto.QuizAdminResponse;
 import com.example.demo.quiz.dto.QuizRequest;
-import com.example.demo.quiz.dto.QuizResponse;
+import com.example.demo.quiz.dto.QuizUserResponse;
 import com.example.demo.quiz.service.QuizService;
 import java.net.URI;
 import java.util.List;
@@ -24,17 +25,17 @@ public class QuizController {
   private final QuizService quizService;
 
   @GetMapping
-  public List<QuizResponse> findAll() {
+  public List<QuizAdminResponse> findAll() {
     return quizService.findAll();
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<QuizResponse> findById(@PathVariable Long id) {
+  public ResponseEntity<QuizAdminResponse> findById(@PathVariable Long id) {
     return quizService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
   @PostMapping
-  public ResponseEntity<QuizResponse> create(@RequestBody QuizRequest request) {
+  public ResponseEntity<QuizAdminResponse> create(@RequestBody QuizRequest request) {
     return quizService
         .create(request)
         .map(
@@ -44,9 +45,14 @@ public class QuizController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<QuizResponse> update(
+  public ResponseEntity<QuizAdminResponse> update(
       @PathVariable Long id, @RequestBody QuizRequest request) {
     return quizService.update(id, request).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+  }
+
+  @GetMapping("/events/{eventId}/today")
+  public List<QuizUserResponse> findTodayByEvent(@PathVariable Long eventId) {
+    return quizService.findTodayByEvent(eventId);
   }
 
   @DeleteMapping("/{id}")
