@@ -10,12 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 public class DemoApplication {
 
-  @PostConstruct
-  public void started() {
-    // JVM의 기본 시간대를 UTC로 설정
-    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-  }
-
   public static void main(String[] args) {
     SpringApplication.run(DemoApplication.class, args);
   }
