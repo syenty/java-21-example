@@ -11,6 +11,7 @@ import com.example.demo.user.repository.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,33 +30,32 @@ public class EventAttendanceServiceImpl implements EventAttendanceService {
   @Override
   @Transactional
   public EventAttendanceResponse attend(Long eventId, Long userId) {
-    Event event =
-        eventRepository
-            .findById(eventId)
-            .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
-    User user =
-        userRepository
-            .findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+    Event event = eventRepository
+        .findById(eventId)
+        .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
     Instant now = Instant.now();
     LocalDate today = LocalDate.now(ZONE_ID);
+
+    Optional<EventAttendance> existingAttendance = attendanceRepository
+        .findByEvent_IdAndUser_IdAndAttendanceDate(eventId, userId, today);
+    if (existingAttendance.isPresent()) {
+      return EventAttendanceResponse.of(existingAttendance.get());
+    }
 
     if (!event.isWithinParticipationWindow(now, ZONE_ID)) {
       throw new IllegalStateException("지정된 참여 시간이 아닙니다.");
     }
 
-    if (attendanceRepository.existsByEvent_IdAndUser_IdAndAttendanceDate(eventId, userId, today)) {
-      throw new IllegalStateException("이미 출석이 처리되었습니다.");
-    }
-
-    EventAttendance attendance =
-        EventAttendance.builder()
-            .event(event)
-            .user(user)
-            .attendanceDt(now)
-            .attendanceDate(today)
-            .build();
+    EventAttendance attendance = EventAttendance.builder()
+        .event(event)
+        .user(user)
+        .attendanceDt(now)
+        .attendanceDate(today)
+        .build();
 
     return EventAttendanceResponse.of(attendanceRepository.save(attendance));
   }
