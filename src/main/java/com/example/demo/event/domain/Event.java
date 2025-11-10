@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,16 +37,16 @@ public class Event extends BaseTimeEntity {
   private String description;
 
   @Column(nullable = false)
-  private LocalDateTime startDt;
+  private LocalDateTime startDt; // UTC
 
   @Column(nullable = false)
-  private LocalDateTime endDt;
+  private LocalDateTime endDt; // UTC
 
   @Column(nullable = false)
-  private LocalTime participationStartTime;
+  private LocalTime participationStartTime; // KST
 
   @Column(nullable = false)
-  private LocalTime participationEndTime;
+  private LocalTime participationEndTime; // KST
 
   @Column(nullable = false)
   private int maxDailyTry = 1;
@@ -68,10 +69,9 @@ public class Event extends BaseTimeEntity {
     this.description = description;
     this.startDt = startDt;
     this.endDt = endDt;
-    this.participationStartTime =
-        Objects.requireNonNull(participationStartTime, "participationStartTime must not be null");
-    this.participationEndTime =
-        Objects.requireNonNull(participationEndTime, "participationEndTime must not be null");
+    this.participationStartTime = Objects.requireNonNull(participationStartTime,
+        "participationStartTime must not be null");
+    this.participationEndTime = Objects.requireNonNull(participationEndTime, "participationEndTime must not be null");
     this.maxDailyTry = maxDailyTry != 0 ? maxDailyTry : 1;
     this.status = status != null ? status : EventStatus.READY;
   }
@@ -113,12 +113,12 @@ public class Event extends BaseTimeEntity {
   }
 
   public boolean isWithinParticipationWindow(Instant now, ZoneId zoneId) {
-    LocalDateTime current = LocalDateTime.ofInstant(now, zoneId);
-    if (current.isBefore(startDt) || current.isAfter(endDt)) {
+    LocalDateTime currentUtc = LocalDateTime.ofInstant(now, ZoneOffset.UTC);
+    if (currentUtc.isBefore(startDt) || currentUtc.isAfter(endDt)) {
       return false;
     }
-    LocalTime currentTime = current.toLocalTime();
-    return !currentTime.isBefore(participationStartTime)
-        && !currentTime.isAfter(participationEndTime);
+
+    LocalTime currentKstTime = now.atZone(zoneId).toLocalTime();
+    return !currentKstTime.isBefore(participationStartTime) && !currentKstTime.isAfter(participationEndTime);
   }
 }
