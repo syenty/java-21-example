@@ -1,5 +1,6 @@
 package com.example.demo.participation.service.impl;
 
+import com.example.demo.common.util.DateUtil;
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.domain.EventDailySequence;
 import com.example.demo.event.domain.EventDailySequenceId;
@@ -20,8 +21,6 @@ import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ParticipationServiceImpl implements ParticipationService {
-
-  private static final ZoneId ZONE_ID = ZoneId.of("Asia/Seoul");
 
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
@@ -46,9 +43,9 @@ public class ParticipationServiceImpl implements ParticipationService {
   @Transactional
   public ParticipationResult participate(EventParticipationRequest request) {
 
-    ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
+    ZonedDateTime nowUtc = DateUtil.nowUtc();
     Instant participationInstant = nowUtc.toInstant();
-    LocalDate participationDate = nowUtc.withZoneSameInstant(ZONE_ID).toLocalDate();
+    LocalDate participationDate = DateUtil.utcToAsiaSeoulDate(nowUtc);
 
     Event event = eventRepository
         .findById(request.eventId())
