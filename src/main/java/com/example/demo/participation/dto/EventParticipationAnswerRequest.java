@@ -2,7 +2,7 @@ package com.example.demo.participation.dto;
 
 import java.time.Instant;
 
-public record QuizParticipationAnswerRequest(
+public record EventParticipationAnswerRequest(
     Long participationId,
     Long quizId,
     Long optionId,

@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -87,7 +88,7 @@ public class RewardPolicy extends BaseTimeEntity {
       final String rewardValue) {
     this.event = event;
     this.name = name;
-    this.policyType = policyType;
+    this.policyType = Objects.requireNonNull(policyType, "policyType must not be null");
     this.startDt = startDt;
     this.endDt = endDt;
     this.winnerLimitTotal = winnerLimitTotal;

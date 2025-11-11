@@ -1,7 +1,7 @@
 package com.example.demo.quiz.service.impl;
 
 import com.example.demo.event.repository.EventRepository;
-import com.example.demo.participation.dto.QuizParticipationRequest;
+import com.example.demo.participation.dto.EventParticipationRequest;
 import com.example.demo.quiz.domain.Quiz;
 import com.example.demo.quiz.domain.QuizOption;
 import com.example.demo.quiz.dto.QuizAdminResponse;
@@ -168,12 +168,12 @@ public class QuizServiceImpl implements QuizService {
   }
 
   @Override
-  public boolean areAllAnswersCorrect(Long eventId, List<QuizParticipationRequest.QuizAnswer> answers) {
+  public boolean areAllAnswersCorrect(Long eventId, List<EventParticipationRequest.QuizAnswer> answers) {
     if (answers == null || answers.isEmpty()) {
       return false;
     }
 
-    for (QuizParticipationRequest.QuizAnswer answer : answers) {
+    for (EventParticipationRequest.QuizAnswer answer : answers) {
       if (answer == null || answer.quizId() == null) {
         return false;
       }

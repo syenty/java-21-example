@@ -1,10 +1,10 @@
 package com.example.demo.participation.dto;
 
-import com.example.demo.participation.domain.QuizParticipation;
+import com.example.demo.participation.domain.EventParticipation;
 import java.time.Instant;
 import java.time.LocalDate;
 
-public record QuizParticipationResponse(
+public record EventParticipationResponse(
     Long id,
     Long eventId,
     Long userId,
@@ -15,8 +15,8 @@ public record QuizParticipationResponse(
     int correctCount,
     int totalQuestions) {
 
-  public static QuizParticipationResponse of(QuizParticipation participation) {
-    return new QuizParticipationResponse(
+  public static EventParticipationResponse of(EventParticipation participation) {
+    return new EventParticipationResponse(
         participation.getId(),
         participation.getEvent().getId(),
         participation.getUser().getId(),

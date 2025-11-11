@@ -54,7 +54,7 @@ VALUES
 (39, 1, 36, '2025-11-09 15:08:00', '2025-11-10'),
 (40, 1, 37, '2025-11-09 15:09:00', '2025-11-10'),
 
-INSERT INTO quiz_participation
+INSERT INTO event_participation
 (id, event_id, user_id, participation_dt, participation_date,
  daily_order, correct, correct_count, total_questions)
 VALUES
@@ -106,7 +106,7 @@ VALUES
 (39, 1, 36, '2025-11-09 15:08:00', '2025-11-10', 9, 1, 1, 1),
 (40, 1, 37, '2025-11-09 15:09:00', '2025-11-10',10, 1, 1, 1),
 
-INSERT INTO quiz_participation_answer
+INSERT INTO event_participation_answer
 (id, participation_id, quiz_id, option_id, answer_text, correct, answer_dt)
 VALUES
 -- Day 1 : quiz_id=1, option_id=1 (O)

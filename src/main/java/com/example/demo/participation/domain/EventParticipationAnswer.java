@@ -20,17 +20,17 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "quiz_participation_answer", uniqueConstraints = @UniqueConstraint(name = "uk_qpa_participation_quiz", columnNames = {
+@Table(name = "event_participation_answer", uniqueConstraints = @UniqueConstraint(name = "uk_epa_participation_quiz", columnNames = {
     "participation_id", "quiz_id" }))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class QuizParticipationAnswer {
+public class EventParticipationAnswer {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  private QuizParticipation participation;
+  private EventParticipation participation;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Quiz quiz;
@@ -48,8 +48,8 @@ public class QuizParticipationAnswer {
   private Instant answeredDt;
 
   @Builder
-  private QuizParticipationAnswer(
-      final QuizParticipation participation,
+  private EventParticipationAnswer(
+      final EventParticipation participation,
       final Quiz quiz,
       final QuizOption option,
       final String answerText,
@@ -74,7 +74,7 @@ public class QuizParticipationAnswer {
     this.option = option;
   }
 
-  public void changeParticipation(QuizParticipation participation) {
+  public void changeParticipation(EventParticipation participation) {
     this.participation = participation;
   }
 

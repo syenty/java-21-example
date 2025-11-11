@@ -1,7 +1,7 @@
 package com.example.demo.reward.domain;
 
 import com.example.demo.event.domain.Event;
-import com.example.demo.participation.domain.QuizParticipation;
+import com.example.demo.participation.domain.EventParticipation;
 import com.example.demo.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +36,7 @@ public class RewardIssue {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  private QuizParticipation participation;
+  private EventParticipation participation;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private RewardPolicy rewardPolicy;
@@ -52,7 +52,7 @@ public class RewardIssue {
   private RewardIssue(
       final Event event,
       final User user,
-      final QuizParticipation participation,
+      final EventParticipation participation,
       final RewardPolicy rewardPolicy,
       final LocalDate rewardDate) {
     this.event = event;
@@ -79,7 +79,7 @@ public class RewardIssue {
     this.user = user;
   }
 
-  public void changeParticipation(QuizParticipation participation) {
+  public void changeParticipation(EventParticipation participation) {
     this.participation = participation;
   }
 

@@ -41,10 +41,10 @@ public final class Endpoint {
 
       Map.entry("/api/quiz-options", new String[] { "GET", "POST" }),
       Map.entry("/api/quiz-options/{id}", new String[] { "GET", "PUT", "DELETE" }),
-      Map.entry("/api/quiz-participations", new String[] { "GET", "POST" }),
-      Map.entry("/api/quiz-participations/{id}", new String[] { "GET", "PUT", "DELETE" }),
-      Map.entry("/api/quiz-participation-answers", new String[] { "GET", "POST" }),
-      Map.entry("/api/quiz-participation-answers/{id}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/event-participations", new String[] { "GET", "POST" }),
+      Map.entry("/api/event-participations/{id}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/event-participation-answers", new String[] { "GET", "POST" }),
+      Map.entry("/api/event-participation-answers/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/reward-policies", new String[] { "GET", "POST" }),
       Map.entry("/api/reward-policies/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/reward-issues", new String[] { "GET", "POST" }),
@@ -59,13 +59,13 @@ public final class Endpoint {
       Map.entry("/api/quizzes", new String[] { "GET" }),
       Map.entry("/api/quizzes/{id}", new String[] { "GET" }),
       Map.entry("/api/quizzes/events/{eventId}/today", new String[] { "GET" }),
-      Map.entry("/api/quiz-participations", new String[] { "GET" }),
-      Map.entry("/api/quiz-participations/{id}", new String[] { "GET" }),
+      Map.entry("/api/event-participations", new String[] { "GET" }),
+      Map.entry("/api/event-participations/{id}", new String[] { "GET" }),
       Map.entry("/api/reward-policies", new String[] { "GET" }),
       Map.entry("/api/reward-policies/{id}", new String[] { "GET" }),
       Map.entry("/api/reward-issues", new String[] { "GET" }),
       Map.entry("/api/reward-issues/{id}", new String[] { "GET" }),
-      Map.entry("/api/event-participations", new String[] { "POST" }));
+      Map.entry("/api/participations", new String[] { "POST" }));
 
   public static String[] urlPatternsFor(Map<String, String[]> endpointMap) {
     return endpointMap.keySet().toArray(new String[0]);

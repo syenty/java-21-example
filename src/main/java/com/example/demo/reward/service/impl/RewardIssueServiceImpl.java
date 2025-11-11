@@ -2,11 +2,10 @@ package com.example.demo.reward.service.impl;
 
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.repository.EventRepository;
-import com.example.demo.participation.domain.QuizParticipation;
-import com.example.demo.participation.repository.QuizParticipationRepository;
+import com.example.demo.participation.domain.EventParticipation;
+import com.example.demo.participation.repository.EventParticipationRepository;
 import com.example.demo.reward.domain.RewardIssue;
 import com.example.demo.reward.domain.RewardPolicy;
-import com.example.demo.reward.domain.RewardPolicyType;
 import com.example.demo.reward.dto.RewardIssueRequest;
 import com.example.demo.reward.dto.RewardIssueResponse;
 import com.example.demo.reward.repository.RewardIssueRepository;
@@ -29,7 +28,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
   private final RewardIssueRepository rewardIssueRepository;
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
-  private final QuizParticipationRepository participationRepository;
+  private final EventParticipationRepository participationRepository;
   private final RewardPolicyRepository rewardPolicyRepository;
 
   @Override
@@ -53,7 +52,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     if (userOpt.isEmpty()) {
       return Optional.empty();
     }
-    Optional<QuizParticipation> participationOpt = participationRepository.findById(request.participationId());
+    Optional<EventParticipation> participationOpt = participationRepository.findById(request.participationId());
     if (participationOpt.isEmpty()) {
       return Optional.empty();
     }
@@ -97,7 +96,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
               }
               if (request.participationId() != null
                   && !issue.getParticipation().getId().equals(request.participationId())) {
-                Optional<QuizParticipation> participationOpt = participationRepository
+                Optional<EventParticipation> participationOpt = participationRepository
                     .findById(request.participationId());
                 if (participationOpt.isEmpty()) {
                   return Optional.<RewardIssueResponse>empty();
@@ -130,7 +129,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
   @Override
   @Transactional
   public Optional<RewardIssueResponse> decideAndIssue(List<RewardPolicy> policies,
-      QuizParticipation participation,
+      EventParticipation participation,
       LocalDate rewardDate) {
     if (policies == null || policies.isEmpty()) {
       return Optional.empty();
@@ -142,11 +141,9 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     }
 
     for (RewardPolicy policy : policies) {
-      if (policy.getPolicyType() == RewardPolicyType.NTH_ORDER) {
-        Optional<RewardIssueResponse> issued = issueNthOrder(policy, participation, rewardDate);
-        if (issued.isPresent()) {
-          return issued;
-        }
+      Optional<RewardIssueResponse> issued = issueNthOrder(policy, participation, rewardDate);
+      if (issued.isPresent()) {
+        return issued;
       }
     }
     return Optional.empty();
@@ -162,7 +159,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
   }
 
   private Optional<RewardIssueResponse> issueNthOrder(RewardPolicy policy,
-      QuizParticipation participation, LocalDate rewardDate) {
+      EventParticipation participation, LocalDate rewardDate) {
     Integer targetOrder = policy.getTargetOrder();
     if (targetOrder == null) {
       return Optional.empty();
@@ -192,7 +189,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     return Optional.of(RewardIssueResponse.of(rewardIssueRepository.save(issue)));
   }
 
-  private long determineParticipationOrder(RewardPolicy policy, QuizParticipation participation) {
+  private long determineParticipationOrder(RewardPolicy policy, EventParticipation participation) {
     // 현재는 일별 스코프만 지원
     return participationRepository.countByEvent_IdAndParticipationDateAndIdLessThanEqual(
         participation.getEvent().getId(), participation.getParticipationDate(), participation.getId());

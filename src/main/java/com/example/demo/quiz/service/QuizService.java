@@ -1,6 +1,6 @@
 package com.example.demo.quiz.service;
 
-import com.example.demo.participation.dto.QuizParticipationRequest;
+import com.example.demo.participation.dto.EventParticipationRequest;
 import com.example.demo.quiz.dto.QuizAdminResponse;
 import com.example.demo.quiz.dto.QuizRequest;
 import com.example.demo.quiz.dto.QuizUserResponse;
@@ -25,5 +25,5 @@ public interface QuizService {
 
   boolean isCorrectAnswer(Long quizId, Long eventId, String answer);
 
-  boolean areAllAnswersCorrect(Long eventId, List<QuizParticipationRequest.QuizAnswer> answers);
+  boolean areAllAnswersCorrect(Long eventId, List<EventParticipationRequest.QuizAnswer> answers);
 }

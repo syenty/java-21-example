@@ -1,12 +1,12 @@
 package com.example.demo.participation.service.impl;
 
-import com.example.demo.participation.domain.QuizParticipation;
-import com.example.demo.participation.domain.QuizParticipationAnswer;
-import com.example.demo.participation.dto.QuizParticipationAnswerRequest;
-import com.example.demo.participation.dto.QuizParticipationAnswerResponse;
-import com.example.demo.participation.repository.QuizParticipationAnswerRepository;
-import com.example.demo.participation.repository.QuizParticipationRepository;
-import com.example.demo.participation.service.QuizParticipationAnswerService;
+import com.example.demo.participation.domain.EventParticipation;
+import com.example.demo.participation.domain.EventParticipationAnswer;
+import com.example.demo.participation.dto.EventParticipationAnswerRequest;
+import com.example.demo.participation.dto.EventParticipationAnswerResponse;
+import com.example.demo.participation.repository.EventParticipationAnswerRepository;
+import com.example.demo.participation.repository.EventParticipationRepository;
+import com.example.demo.participation.service.EventParticipationAnswerService;
 import com.example.demo.quiz.domain.Quiz;
 import com.example.demo.quiz.domain.QuizOption;
 import com.example.demo.quiz.repository.QuizOptionRepository;
@@ -21,30 +21,30 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class QuizParticipationAnswerServiceImpl implements QuizParticipationAnswerService {
+public class EventParticipationAnswerServiceImpl implements EventParticipationAnswerService {
 
-  private final QuizParticipationAnswerRepository answerRepository;
-  private final QuizParticipationRepository participationRepository;
+  private final EventParticipationAnswerRepository eventParticipationAnswerRepository;
+  private final EventParticipationRepository eventParticipationRepository;
   private final QuizRepository quizRepository;
   private final QuizOptionRepository optionRepository;
 
   @Override
-  public List<QuizParticipationAnswerResponse> findAll() {
-    return answerRepository.findAll().stream()
-        .map(QuizParticipationAnswerResponse::of)
+  public List<EventParticipationAnswerResponse> findAll() {
+    return eventParticipationAnswerRepository.findAll().stream()
+        .map(EventParticipationAnswerResponse::of)
         .toList();
   }
 
   @Override
-  public Optional<QuizParticipationAnswerResponse> findById(Long id) {
-    return answerRepository.findById(id).map(QuizParticipationAnswerResponse::of);
+  public Optional<EventParticipationAnswerResponse> findById(Long id) {
+    return eventParticipationAnswerRepository.findById(id).map(EventParticipationAnswerResponse::of);
   }
 
   @Override
   @Transactional
-  public Optional<QuizParticipationAnswerResponse> create(QuizParticipationAnswerRequest request) {
-    Optional<QuizParticipation> participationOpt =
-        participationRepository.findById(request.participationId());
+  public Optional<EventParticipationAnswerResponse> create(EventParticipationAnswerRequest request) {
+    Optional<EventParticipation> participationOpt =
+      eventParticipationRepository.findById(request.participationId());
     if (participationOpt.isEmpty()) {
       return Optional.empty();
     }
@@ -56,8 +56,8 @@ public class QuizParticipationAnswerServiceImpl implements QuizParticipationAnsw
     if (request.optionId() != null) {
       option = optionRepository.findById(request.optionId()).orElse(null);
     }
-    QuizParticipationAnswer answer =
-        QuizParticipationAnswer.builder()
+    EventParticipationAnswer answer =
+        EventParticipationAnswer.builder()
             .participation(participationOpt.get())
             .quiz(quizOpt.get())
             .option(option)
@@ -65,30 +65,30 @@ public class QuizParticipationAnswerServiceImpl implements QuizParticipationAnsw
             .correct(request.correct() != null && request.correct())
             .answeredDt(request.answeredDt() != null ? request.answeredDt() : Instant.now())
             .build();
-    return Optional.of(QuizParticipationAnswerResponse.of(answerRepository.save(answer)));
+    return Optional.of(EventParticipationAnswerResponse.of(eventParticipationAnswerRepository.save(answer)));
   }
 
   @Override
   @Transactional
-  public Optional<QuizParticipationAnswerResponse> update(
-      Long id, QuizParticipationAnswerRequest request) {
-    return answerRepository
+  public Optional<EventParticipationAnswerResponse> update(
+      Long id, EventParticipationAnswerRequest request) {
+    return eventParticipationAnswerRepository
         .findById(id)
         .flatMap(
             answer -> {
               if (request.participationId() != null
                   && !answer.getParticipation().getId().equals(request.participationId())) {
-                Optional<QuizParticipation> participationOpt =
-                    participationRepository.findById(request.participationId());
+                Optional<EventParticipation> participationOpt =
+                  eventParticipationRepository.findById(request.participationId());
                 if (participationOpt.isEmpty()) {
-                  return Optional.<QuizParticipationAnswerResponse>empty();
+                  return Optional.<EventParticipationAnswerResponse>empty();
                 }
                 answer.changeParticipation(participationOpt.get());
               }
               if (request.quizId() != null && !answer.getQuiz().getId().equals(request.quizId())) {
                 Optional<Quiz> quizOpt = quizRepository.findById(request.quizId());
                 if (quizOpt.isEmpty()) {
-                  return Optional.<QuizParticipationAnswerResponse>empty();
+                  return Optional.<EventParticipationAnswerResponse>empty();
                 }
                 answer.changeQuiz(quizOpt.get());
               }
@@ -98,17 +98,17 @@ public class QuizParticipationAnswerServiceImpl implements QuizParticipationAnsw
               }
               answer.update(
                   request.answerText(), request.correct(), request.answeredDt(), option);
-              return Optional.of(QuizParticipationAnswerResponse.of(answer));
+              return Optional.of(EventParticipationAnswerResponse.of(answer));
             });
   }
 
   @Override
   @Transactional
   public boolean delete(Long id) {
-    if (!answerRepository.existsById(id)) {
+    if (!eventParticipationAnswerRepository.existsById(id)) {
       return false;
     }
-    answerRepository.deleteById(id);
+    eventParticipationAnswerRepository.deleteById(id);
     return true;
   }
 }

@@ -1,6 +1,6 @@
 package com.example.demo.reward.service;
 
-import com.example.demo.participation.domain.QuizParticipation;
+import com.example.demo.participation.domain.EventParticipation;
 import com.example.demo.reward.domain.RewardPolicy;
 import com.example.demo.reward.dto.RewardIssueRequest;
 import com.example.demo.reward.dto.RewardIssueResponse;
@@ -20,5 +20,5 @@ public interface RewardIssueService {
   boolean delete(Long id);
 
   Optional<RewardIssueResponse> decideAndIssue(
-      List<RewardPolicy> policies, QuizParticipation participation, LocalDate rewardDate);
+      List<RewardPolicy> policies, EventParticipation participation, LocalDate rewardDate);
 }

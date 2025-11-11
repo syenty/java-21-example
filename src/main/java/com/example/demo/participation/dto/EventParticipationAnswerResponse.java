@@ -1,9 +1,9 @@
 package com.example.demo.participation.dto;
 
-import com.example.demo.participation.domain.QuizParticipationAnswer;
+import com.example.demo.participation.domain.EventParticipationAnswer;
 import java.time.Instant;
 
-public record QuizParticipationAnswerResponse(
+public record EventParticipationAnswerResponse(
     Long id,
     Long participationId,
     Long quizId,
@@ -12,8 +12,8 @@ public record QuizParticipationAnswerResponse(
     boolean correct,
     Instant answeredDt) {
 
-  public static QuizParticipationAnswerResponse of(QuizParticipationAnswer answer) {
-    return new QuizParticipationAnswerResponse(
+  public static EventParticipationAnswerResponse of(EventParticipationAnswer answer) {
+    return new EventParticipationAnswerResponse(
         answer.getId(),
         answer.getParticipation().getId(),
         answer.getQuiz().getId(),

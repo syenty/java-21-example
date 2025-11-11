@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table
+@Table(name = "event_participation")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class QuizParticipation {
+public class EventParticipation {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +52,7 @@ public class QuizParticipation {
   private int totalQuestions;
 
   @Builder
-  private QuizParticipation(
+  private EventParticipation(
       final Event event,
       final User user,
       final Instant participationDt,
