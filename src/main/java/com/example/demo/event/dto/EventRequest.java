@@ -12,5 +12,6 @@ public record EventRequest(
     LocalTime participationStartTime,
     LocalTime participationEndTime,
     Integer maxDailyTry,
-    EventStatus status) {
+    EventStatus status,
+    Integer rewardLimitPerUser) {
 }

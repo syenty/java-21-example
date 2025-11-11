@@ -47,6 +47,7 @@ public class EventServiceImpl implements EventService {
                     ? request.maxDailyTry()
                     : 1)
             .status(request.status())
+            .rewardLimitPerUser(request.rewardLimitPerUser())
             .build();
 
     Event saved = eventRepository.save(event);
@@ -68,7 +69,8 @@ public class EventServiceImpl implements EventService {
                   request.participationStartTime(),
                   request.participationEndTime(),
                   request.maxDailyTry(),
-                  request.status());
+                  request.status(),
+                  request.rewardLimitPerUser());
               return EventResponse.of(event);
             });
   }

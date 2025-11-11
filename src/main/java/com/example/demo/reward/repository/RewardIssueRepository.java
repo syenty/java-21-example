@@ -4,4 +4,5 @@ import com.example.demo.reward.domain.RewardIssue;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RewardIssueRepository extends JpaRepository<RewardIssue, Long> {
+  long countByEvent_IdAndUser_Id(Long eventId, Long userId);
 }

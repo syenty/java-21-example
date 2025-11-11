@@ -135,6 +135,12 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     if (policies == null || policies.isEmpty()) {
       return Optional.empty();
     }
+
+    Event event = participation.getEvent();
+    if (hasReachedEventRewardLimit(event, participation.getUser().getId())) {
+      return Optional.empty();
+    }
+
     for (RewardPolicy policy : policies) {
       if (policy.getPolicyType() == RewardPolicyType.NTH_ORDER) {
         Optional<RewardIssueResponse> issued = issueNthOrder(policy, participation, rewardDate);
@@ -144,6 +150,16 @@ public class RewardIssueServiceImpl implements RewardIssueService {
       }
     }
     return Optional.empty();
+  }
+
+  private boolean hasReachedEventRewardLimit(Event event, Long userId) {
+    Integer limit = event.getRewardLimitPerUser();
+    if (limit == null || limit <= 0) {
+      return false;
+    }
+    long issuedCount =
+        rewardIssueRepository.countByEvent_IdAndUser_Id(event.getId(), userId);
+    return issuedCount >= limit;
   }
 
   private Optional<RewardIssueResponse> issueNthOrder(RewardPolicy policy,
