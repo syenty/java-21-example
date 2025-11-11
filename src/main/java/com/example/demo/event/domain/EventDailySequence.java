@@ -25,17 +25,17 @@ public class EventDailySequence {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Event event;
 
-  @Column(nullable = false)
-  private int lastSequence;
+  @Column(name = "last_seq", nullable = false)
+  private int lastSeq;
 
   @Builder
-  private EventDailySequence(Event event, EventDailySequenceId id, int lastSequence) {
+  private EventDailySequence(Event event, EventDailySequenceId id, int lastSeq) {
     this.event = event;
     this.id = id;
-    this.lastSequence = lastSequence;
+    this.lastSeq = lastSeq;
   }
 
-  public void updateLastSequence(int lastSequence) {
-    this.lastSequence = lastSequence;
+  public void updateLastSeq(int lastSeq) {
+    this.lastSeq = lastSeq;
   }
 }

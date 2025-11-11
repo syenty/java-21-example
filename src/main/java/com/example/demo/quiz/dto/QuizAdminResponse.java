@@ -4,8 +4,9 @@ import com.example.demo.quiz.domain.Quiz;
 import com.example.demo.quiz.domain.QuizType;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
-public record QuizResponse(
+public record QuizAdminResponse(
     Long id,
     Long eventId,
     QuizType type,
@@ -14,10 +15,19 @@ public record QuizResponse(
     LocalDate quizDate,
     int questionOrder,
     boolean active,
-    Instant createdDt) {
+    Instant createdDt,
+    List<QuizOptionResponse> options) {
 
-  public static QuizResponse of(Quiz quiz) {
-    return new QuizResponse(
+  public QuizAdminResponse {
+    options = options == null ? List.of() : List.copyOf(options);
+  }
+
+  public static QuizAdminResponse of(Quiz quiz) {
+    return of(quiz, List.of());
+  }
+
+  public static QuizAdminResponse of(Quiz quiz, List<QuizOptionResponse> options) {
+    return new QuizAdminResponse(
         quiz.getId(),
         quiz.getEvent().getId(),
         quiz.getType(),
@@ -26,6 +36,7 @@ public record QuizResponse(
         quiz.getQuizDate(),
         quiz.getQuestionOrder(),
         quiz.isActive(),
-        quiz.getCreatedDt());
+        quiz.getCreatedDt(),
+        options);
   }
 }

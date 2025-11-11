@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table
+@Table(name = "event_participation")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class QuizParticipation {
+public class EventParticipation {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,23 +46,19 @@ public class QuizParticipation {
   private boolean correct;
 
   @Column(nullable = false)
-  private int score;
-
-  @Column(nullable = false)
   private int correctCount;
 
   @Column(nullable = false)
   private int totalQuestions;
 
   @Builder
-  private QuizParticipation(
+  private EventParticipation(
       final Event event,
       final User user,
       final Instant participationDt,
       final LocalDate participationDate,
       final int dailyOrder,
       final boolean correct,
-      final int score,
       final int correctCount,
       final int totalQuestions) {
     this.event = event;
@@ -71,7 +67,6 @@ public class QuizParticipation {
     this.participationDate = participationDate;
     this.dailyOrder = dailyOrder;
     this.correct = correct;
-    this.score = score;
     this.correctCount = correctCount;
     this.totalQuestions = totalQuestions;
   }
@@ -89,7 +84,6 @@ public class QuizParticipation {
       LocalDate participationDate,
       Integer dailyOrder,
       Boolean correct,
-      Integer score,
       Integer correctCount,
       Integer totalQuestions) {
     if (participationDt != null) {
@@ -103,9 +97,6 @@ public class QuizParticipation {
     }
     if (correct != null) {
       this.correct = correct;
-    }
-    if (score != null) {
-      this.score = score;
     }
     if (correctCount != null) {
       this.correctCount = correctCount;

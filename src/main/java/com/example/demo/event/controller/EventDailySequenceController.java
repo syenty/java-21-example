@@ -41,7 +41,7 @@ public class EventDailySequenceController {
   public ResponseEntity<EventDailySequenceResponse> create(
       @PathVariable Long eventId, @RequestBody EventDailySequenceRequest request) {
     EventDailySequenceRequest normalized =
-        new EventDailySequenceRequest(eventId, request.seqDate(), request.lastSequence());
+        new EventDailySequenceRequest(eventId, request.seqDate(), request.lastSeq());
     return sequenceService
         .create(normalized)
         .map(

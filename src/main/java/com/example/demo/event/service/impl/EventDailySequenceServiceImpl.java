@@ -48,7 +48,7 @@ public class EventDailySequenceServiceImpl implements EventDailySequenceService 
         EventDailySequence.builder()
             .event(eventOpt.get())
             .id(new EventDailySequenceId(request.eventId(), request.seqDate()))
-            .lastSequence(request.lastSequence())
+            .lastSeq(request.lastSeq())
             .build();
     return Optional.of(EventDailySequenceResponse.of(sequenceRepository.save(sequence)));
   }
@@ -61,7 +61,7 @@ public class EventDailySequenceServiceImpl implements EventDailySequenceService 
         .findById(new EventDailySequenceId(eventId, seqDate))
         .map(
             sequence -> {
-              sequence.updateLastSequence(request.lastSequence());
+              sequence.updateLastSeq(request.lastSeq());
               return EventDailySequenceResponse.of(sequence);
             });
   }

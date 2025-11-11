@@ -15,6 +15,7 @@ public record EventResponse(
     LocalTime participationStartTime,
     LocalTime participationEndTime,
     int maxDailyTry,
+    Integer rewardLimitPerUser,
     EventStatus status,
     Instant createdDt,
     Instant updatedDt) {
@@ -29,6 +30,7 @@ public record EventResponse(
         event.getParticipationStartTime(),
         event.getParticipationEndTime(),
         event.getMaxDailyTry(),
+        event.getRewardLimitPerUser(),
         event.getStatus(),
         event.getCreatedDt(),
         event.getUpdatedDt());

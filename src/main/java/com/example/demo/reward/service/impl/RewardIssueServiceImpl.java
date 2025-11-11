@@ -2,11 +2,10 @@ package com.example.demo.reward.service.impl;
 
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.repository.EventRepository;
-import com.example.demo.participation.domain.QuizParticipation;
-import com.example.demo.participation.repository.QuizParticipationRepository;
+import com.example.demo.participation.domain.EventParticipation;
+import com.example.demo.participation.repository.EventParticipationRepository;
 import com.example.demo.reward.domain.RewardIssue;
 import com.example.demo.reward.domain.RewardPolicy;
-import com.example.demo.reward.domain.RewardPolicyType;
 import com.example.demo.reward.dto.RewardIssueRequest;
 import com.example.demo.reward.dto.RewardIssueResponse;
 import com.example.demo.reward.repository.RewardIssueRepository;
@@ -29,7 +28,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
   private final RewardIssueRepository rewardIssueRepository;
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
-  private final QuizParticipationRepository participationRepository;
+  private final EventParticipationRepository participationRepository;
   private final RewardPolicyRepository rewardPolicyRepository;
 
   @Override
@@ -53,25 +52,22 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     if (userOpt.isEmpty()) {
       return Optional.empty();
     }
-    Optional<QuizParticipation> participationOpt =
-        participationRepository.findById(request.participationId());
+    Optional<EventParticipation> participationOpt = participationRepository.findById(request.participationId());
     if (participationOpt.isEmpty()) {
       return Optional.empty();
     }
-    Optional<RewardPolicy> policyOpt =
-        rewardPolicyRepository.findById(request.rewardPolicyId());
+    Optional<RewardPolicy> policyOpt = rewardPolicyRepository.findById(request.rewardPolicyId());
     if (policyOpt.isEmpty()) {
       return Optional.empty();
     }
 
-    RewardIssue issue =
-        RewardIssue.builder()
-            .event(eventOpt.get())
-            .user(userOpt.get())
-            .participation(participationOpt.get())
-            .rewardPolicy(policyOpt.get())
-            .rewardDate(request.rewardDate())
-            .build();
+    RewardIssue issue = RewardIssue.builder()
+        .event(eventOpt.get())
+        .user(userOpt.get())
+        .participation(participationOpt.get())
+        .rewardPolicy(policyOpt.get())
+        .rewardDate(request.rewardDate())
+        .build();
     return Optional.of(RewardIssueResponse.of(rewardIssueRepository.save(issue)));
   }
 
@@ -100,8 +96,8 @@ public class RewardIssueServiceImpl implements RewardIssueService {
               }
               if (request.participationId() != null
                   && !issue.getParticipation().getId().equals(request.participationId())) {
-                Optional<QuizParticipation> participationOpt =
-                    participationRepository.findById(request.participationId());
+                Optional<EventParticipation> participationOpt = participationRepository
+                    .findById(request.participationId());
                 if (participationOpt.isEmpty()) {
                   return Optional.<RewardIssueResponse>empty();
                 }
@@ -109,8 +105,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
               }
               if (request.rewardPolicyId() != null
                   && !issue.getRewardPolicy().getId().equals(request.rewardPolicyId())) {
-                Optional<RewardPolicy> policyOpt =
-                    rewardPolicyRepository.findById(request.rewardPolicyId());
+                Optional<RewardPolicy> policyOpt = rewardPolicyRepository.findById(request.rewardPolicyId());
                 if (policyOpt.isEmpty()) {
                   return Optional.<RewardIssueResponse>empty();
                 }
@@ -133,46 +128,95 @@ public class RewardIssueServiceImpl implements RewardIssueService {
 
   @Override
   @Transactional
-  public Optional<RewardIssueResponse> decideAndIssue(
-      List<RewardPolicy> policies, QuizParticipation participation, LocalDate rewardDate) {
+  public Optional<RewardIssueResponse> decideAndIssue(List<RewardPolicy> policies,
+      EventParticipation participation,
+      LocalDate rewardDate) {
     if (policies == null || policies.isEmpty()) {
       return Optional.empty();
     }
+
+    Event event = participation.getEvent();
+    if (hasReachedEventRewardLimit(event, participation.getUser().getId())) {
+      return Optional.empty();
+    }
+
     for (RewardPolicy policy : policies) {
-      if (policy.getPolicyType() == RewardPolicyType.NTH_ORDER) {
-        Optional<RewardIssueResponse> issued =
-            issueNthOrder(policy, participation, rewardDate);
-        if (issued.isPresent()) {
-          return issued;
-        }
+      Optional<RewardIssueResponse> issued = issueNthOrder(policy, participation, rewardDate);
+      if (issued.isPresent()) {
+        return issued;
       }
     }
     return Optional.empty();
   }
 
-  private Optional<RewardIssueResponse> issueNthOrder(
-      RewardPolicy policy, QuizParticipation participation, LocalDate rewardDate) {
+  private boolean hasReachedEventRewardLimit(Event event, Long userId) {
+    Integer limit = event.getRewardLimitPerUser();
+    if (limit == null || limit <= 0) {
+      return false;
+    }
+    long issuedCount = rewardIssueRepository.countByEvent_IdAndUser_Id(event.getId(), userId);
+    return issuedCount >= limit;
+  }
+
+  private Optional<RewardIssueResponse> issueNthOrder(RewardPolicy policy,
+      EventParticipation participation, LocalDate rewardDate) {
     Integer targetOrder = policy.getTargetOrder();
     if (targetOrder == null) {
       return Optional.empty();
     }
 
-    long order =
-        participationRepository.countByEvent_IdAndIdLessThanEqual(
-            participation.getEvent().getId(), participation.getId());
-    if (order != targetOrder) {
+    long order = determineParticipationOrder(policy, participation);
+    if (order < targetOrder) {
       return Optional.empty();
     }
 
-    RewardIssue issue =
-        RewardIssue.builder()
-            .event(participation.getEvent())
-            .user(participation.getUser())
-            .participation(participation)
-            .rewardPolicy(policy)
-            .rewardDate(rewardDate)
-            .build();
+    if (hasWinnerForScope(policy, rewardDate)) {
+      return Optional.empty();
+    }
+
+    if (exceedsUserPolicyLimit(policy, participation.getUser().getId(), rewardDate)) {
+      return Optional.empty();
+    }
+
+    RewardIssue issue = RewardIssue.builder()
+        .event(participation.getEvent())
+        .user(participation.getUser())
+        .participation(participation)
+        .rewardPolicy(policy)
+        .rewardDate(rewardDate)
+        .build();
 
     return Optional.of(RewardIssueResponse.of(rewardIssueRepository.save(issue)));
+  }
+
+  private long determineParticipationOrder(RewardPolicy policy, EventParticipation participation) {
+    // 현재는 일별 스코프만 지원
+    return participationRepository.countByEvent_IdAndParticipationDateAndIdLessThanEqual(
+        participation.getEvent().getId(), participation.getParticipationDate(), participation.getId());
+  }
+
+  private boolean hasWinnerForScope(RewardPolicy policy, LocalDate rewardDate) {
+    return rewardIssueRepository.existsByRewardPolicy_IdAndRewardDate(policy.getId(), rewardDate);
+  }
+
+  private boolean exceedsUserPolicyLimit(RewardPolicy policy, Long userId, LocalDate rewardDate) {
+    Integer totalLimit = policy.getUserLimitTotal();
+    if (totalLimit != null && totalLimit > 0) {
+      long totalCount = rewardIssueRepository.countByRewardPolicy_IdAndUser_Id(policy.getId(), userId);
+      if (totalCount >= totalLimit) {
+        return true;
+      }
+    }
+
+    Integer dailyLimit = policy.getUserLimitPerDay();
+    if (dailyLimit != null && dailyLimit > 0) {
+      long dailyCount = rewardIssueRepository.countByRewardPolicy_IdAndUser_IdAndRewardDate(
+          policy.getId(), userId, rewardDate);
+      if (dailyCount >= dailyLimit) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

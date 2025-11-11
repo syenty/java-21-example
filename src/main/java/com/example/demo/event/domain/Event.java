@@ -51,6 +51,9 @@ public class Event extends BaseTimeEntity {
   @Column(nullable = false)
   private int maxDailyTry = 1;
 
+  @Column
+  private Integer rewardLimitPerUser;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private EventStatus status = EventStatus.READY;
@@ -64,7 +67,8 @@ public class Event extends BaseTimeEntity {
       final LocalTime participationStartTime,
       final LocalTime participationEndTime,
       final int maxDailyTry,
-      final EventStatus status) {
+      final EventStatus status,
+      final Integer rewardLimitPerUser) {
     this.name = name;
     this.description = description;
     this.startDt = startDt;
@@ -74,6 +78,7 @@ public class Event extends BaseTimeEntity {
     this.participationEndTime = Objects.requireNonNull(participationEndTime, "participationEndTime must not be null");
     this.maxDailyTry = maxDailyTry != 0 ? maxDailyTry : 1;
     this.status = status != null ? status : EventStatus.READY;
+    this.rewardLimitPerUser = rewardLimitPerUser != null && rewardLimitPerUser > 0 ? rewardLimitPerUser : null;
   }
 
   public void updatePeriod(LocalDateTime startDt, LocalDateTime endDt) {
@@ -89,7 +94,8 @@ public class Event extends BaseTimeEntity {
       LocalTime participationStartTime,
       LocalTime participationEndTime,
       Integer maxDailyTry,
-      EventStatus status) {
+      EventStatus status,
+      Integer rewardLimitPerUser) {
     this.name = name;
     this.description = description;
     this.startDt = startDt;
@@ -106,6 +112,9 @@ public class Event extends BaseTimeEntity {
     if (status != null) {
       this.status = status;
     }
+    if (rewardLimitPerUser != null) {
+      this.rewardLimitPerUser = rewardLimitPerUser > 0 ? rewardLimitPerUser : null;
+    }
   }
 
   public void changeStatus(EventStatus status) {
@@ -120,5 +129,16 @@ public class Event extends BaseTimeEntity {
 
     LocalTime currentKstTime = now.atZone(zoneId).toLocalTime();
     return !currentKstTime.isBefore(participationStartTime) && !currentKstTime.isAfter(participationEndTime);
+  }
+
+  public void ensureActiveDuring(Instant utcNow) {
+    if (status != EventStatus.OPEN) {
+      throw new IllegalStateException("진행 중인 이벤트가 아닙니다.");
+    }
+    Instant eventStart = startDt.toInstant(ZoneOffset.UTC);
+    Instant eventEnd = endDt.toInstant(ZoneOffset.UTC);
+    if (utcNow.isBefore(eventStart) || utcNow.isAfter(eventEnd)) {
+      throw new IllegalStateException("이벤트 기간이 아닙니다.");
+    }
   }
 }

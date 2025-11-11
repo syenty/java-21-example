@@ -1,128 +1,123 @@
 package com.example.demo.participation.service.impl;
 
 import com.example.demo.event.domain.Event;
-import com.example.demo.event.domain.EventDailySequence;
-import com.example.demo.event.domain.EventDailySequenceId;
-import com.example.demo.event.domain.EventStatus;
-import com.example.demo.event.repository.EventDailySequenceRepository;
 import com.example.demo.event.repository.EventRepository;
-import com.example.demo.participation.domain.QuizParticipation;
-import com.example.demo.participation.dto.EventParticipationResult;
-import com.example.demo.participation.dto.QuizParticipationRequest;
-import com.example.demo.participation.dto.QuizParticipationResponse;
-import com.example.demo.participation.repository.QuizParticipationRepository;
+import com.example.demo.participation.domain.EventParticipation;
+import com.example.demo.participation.dto.EventParticipationRequest;
+import com.example.demo.participation.dto.EventParticipationResponse;
+import com.example.demo.participation.repository.EventParticipationRepository;
 import com.example.demo.participation.service.EventParticipationService;
 import com.example.demo.quiz.service.QuizService;
-import com.example.demo.reward.domain.RewardPolicy;
-import com.example.demo.reward.dto.RewardIssueResponse;
-import com.example.demo.reward.service.RewardIssueService;
-import com.example.demo.reward.service.RewardPolicyService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EventParticipationServiceImpl implements EventParticipationService {
 
   private static final ZoneId ZONE_ID = ZoneId.of("Asia/Seoul");
 
+  private final EventParticipationRepository eventParticipationRepository;
   private final EventRepository eventRepository;
   private final UserRepository userRepository;
-  private final QuizParticipationRepository participationRepository;
-  private final EventDailySequenceRepository dailySequenceRepository;
-  private final RewardPolicyService rewardPolicyService;
-  private final RewardIssueService rewardIssueService;
   private final QuizService quizService;
 
   @Override
+  public List<EventParticipationResponse> findAll() {
+    return eventParticipationRepository.findAll().stream()
+        .map(EventParticipationResponse::of)
+        .toList();
+  }
+
+  @Override
+  public Optional<EventParticipationResponse> findById(Long id) {
+    return eventParticipationRepository.findById(id).map(EventParticipationResponse::of);
+  }
+
+  @Override
   @Transactional
-  public EventParticipationResult participate(QuizParticipationRequest request) {
-
-    ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
-    Instant participationInstant = nowUtc.toInstant();
-    LocalDate participationDate = nowUtc.withZoneSameInstant(ZONE_ID).toLocalDate();
-
-    Event event = eventRepository
+  public Optional<EventParticipationResponse> create(EventParticipationRequest request) {
+    if (!quizService.areAllAnswersCorrect(request.eventId(), request.answers())) {
+      throw new IllegalStateException("모든 퀴즈 정답을 맞춰야 참여가 인정됩니다.");
+    }
+    return eventRepository
         .findById(request.eventId())
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이벤트입니다."));
+        .flatMap(
+            event -> userRepository
+                .findById(request.userId())
+                .map(
+                    user -> {
+                      Instant participationInstant = Instant.now();
+                      LocalDate participationDate = LocalDate.now(ZONE_ID);
 
-    User user = userRepository
-        .findById(request.userId())
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                      if (!event.isWithinParticipationWindow(participationInstant, ZONE_ID)) {
+                        throw new IllegalStateException("지정된 참여 시간이 아닙니다.");
+                      }
 
-    validateEvent(event, participationInstant);
+                      if (eventParticipationRepository.existsByEvent_IdAndUser_IdAndParticipationDate(
+                          event.getId(), user.getId(), participationDate)) {
+                        throw new IllegalStateException("이미 퀴즈를 참여했습니다.");
+                      }
 
-    ensureNotParticipatedToday(event.getId(), user.getId(), participationDate);
-    ensureAnsweredCorrectly(event.getId(), request);
-
-    int dailyOrder = nextDailyOrder(event, participationDate);
-
-    QuizParticipation participation = participationRepository.save(
-        QuizParticipation.builder()
-            .event(event)
-            .user(user)
-            .participationDt(participationInstant)
-            .participationDate(participationDate)
-            .dailyOrder(dailyOrder)
-            .correct(true)
-            .score(0)
-            .correctCount(request.answers() != null ? request.answers().size() : 0)
-            .totalQuestions(request.answers() != null ? request.answers().size() : 0)
-            .build());
-
-    List<RewardPolicy> policies = rewardPolicyService.findActivePolicies(event.getId(), participationInstant);
-    RewardIssueResponse reward = rewardIssueService.decideAndIssue(policies, participation, participationDate)
-        .orElse(null);
-
-    return new EventParticipationResult(QuizParticipationResponse.of(participation), reward);
+                      EventParticipation participation = EventParticipation.builder()
+                          .event(event)
+                          .user(user)
+                          .participationDt(participationInstant)
+                          .participationDate(participationDate)
+                          .dailyOrder(1)
+                          .correct(true)
+                          .correctCount(request.answers() != null ? request.answers().size() : 0)
+                          .totalQuestions(request.answers() != null ? request.answers().size() : 0)
+                          .build();
+                      return EventParticipationResponse.of(
+                          eventParticipationRepository.save(participation));
+                    }));
   }
 
-  private void validateEvent(Event event, Instant utcNow) {
-    if (event.getStatus() != EventStatus.OPEN) {
-      throw new IllegalStateException("진행 중인 이벤트가 아닙니다.");
-    }
-    if (utcNow.isBefore(event.getStartDt().toInstant(ZoneOffset.UTC))
-        || utcNow.isAfter(event.getEndDt().toInstant(ZoneOffset.UTC))) {
-      throw new IllegalStateException("이벤트 기간이 아닙니다.");
-    }
-  }
-
-  private void ensureNotParticipatedToday(Long eventId, Long userId, LocalDate date) {
-    if (participationRepository.existsByEvent_IdAndUser_IdAndParticipationDate(
-        eventId, userId, date)) {
-      throw new IllegalStateException("이미 오늘 참여했습니다.");
-    }
-  }
-
-  private void ensureAnsweredCorrectly(Long eventId, QuizParticipationRequest request) {
-    if (!quizService.areAllAnswersCorrect(eventId, request.answers())) {
-      throw new IllegalStateException("퀴즈 정답을 맞춰야 참여가 인정됩니다.");
-    }
-  }
-
-  private int nextDailyOrder(Event event, LocalDate date) {
-    EventDailySequenceId id = new EventDailySequenceId(event.getId(), date);
-    EventDailySequence sequence = dailySequenceRepository
+  @Override
+  @Transactional
+  public Optional<EventParticipationResponse> update(Long id, EventParticipationRequest request) {
+    return eventParticipationRepository
         .findById(id)
-        .orElseGet(
-            () -> EventDailySequence.builder()
-                .event(event)
-                .id(id)
-                .lastSequence(0)
-                .build());
-
-    sequence.updateLastSequence(sequence.getLastSequence() + 1);
-    dailySequenceRepository.save(sequence);
-    return sequence.getLastSequence();
+        .flatMap(
+            participation -> {
+              if (request.eventId() != null
+                  && !participation.getEvent().getId().equals(request.eventId())) {
+                Optional<Event> eventOpt = eventRepository.findById(request.eventId());
+                if (eventOpt.isEmpty()) {
+                  return Optional.<EventParticipationResponse>empty();
+                }
+                participation.changeEvent(eventOpt.get());
+              }
+              if (request.userId() != null
+                  && !participation.getUser().getId().equals(request.userId())) {
+                Optional<User> userOpt = userRepository.findById(request.userId());
+                if (userOpt.isEmpty()) {
+                  return Optional.<EventParticipationResponse>empty();
+                }
+                participation.changeUser(userOpt.get());
+              }
+              // no mutable fields from request anymore
+              return Optional.of(EventParticipationResponse.of(participation));
+            });
   }
 
+  @Override
+  @Transactional
+  public boolean delete(Long id) {
+    if (!eventParticipationRepository.existsById(id)) {
+      return false;
+    }
+    eventParticipationRepository.deleteById(id);
+    return true;
+  }
 }
