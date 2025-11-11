@@ -63,7 +63,7 @@ public class EventParticipationAnswerServiceImpl implements EventParticipationAn
             .option(option)
             .answerText(request.answerText())
             .correct(request.correct() != null && request.correct())
-            .answeredDt(request.answeredDt() != null ? request.answeredDt() : Instant.now())
+            .answerDt(request.answerDt() != null ? request.answerDt() : Instant.now())
             .build();
     return Optional.of(EventParticipationAnswerResponse.of(eventParticipationAnswerRepository.save(answer)));
   }
@@ -97,7 +97,7 @@ public class EventParticipationAnswerServiceImpl implements EventParticipationAn
                 option = optionRepository.findById(request.optionId()).orElse(null);
               }
               answer.update(
-                  request.answerText(), request.correct(), request.answeredDt(), option);
+                  request.answerText(), request.correct(), request.answerDt(), option);
               return Optional.of(EventParticipationAnswerResponse.of(answer));
             });
   }

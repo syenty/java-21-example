@@ -10,7 +10,7 @@ public record EventParticipationAnswerResponse(
     Long optionId,
     String answerText,
     boolean correct,
-    Instant answeredDt) {
+    Instant answerDt) {
 
   public static EventParticipationAnswerResponse of(EventParticipationAnswer answer) {
     return new EventParticipationAnswerResponse(
@@ -20,6 +20,6 @@ public record EventParticipationAnswerResponse(
         answer.getOption() != null ? answer.getOption().getId() : null,
         answer.getAnswerText(),
         answer.isCorrect(),
-        answer.getAnsweredDt());
+        answer.getAnswerDt());
   }
 }

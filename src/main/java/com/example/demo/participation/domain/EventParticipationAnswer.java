@@ -45,7 +45,7 @@ public class EventParticipationAnswer {
   private boolean correct;
 
   @Column(nullable = false)
-  private Instant answeredDt;
+  private Instant answerDt;
 
   @Builder
   private EventParticipationAnswer(
@@ -54,22 +54,22 @@ public class EventParticipationAnswer {
       final QuizOption option,
       final String answerText,
       final boolean correct,
-      final Instant answeredDt) {
+      final Instant answerDt) {
     this.participation = participation;
     this.quiz = quiz;
     this.option = option;
     this.answerText = answerText;
     this.correct = correct;
-    this.answeredDt = answeredDt;
+    this.answerDt = answerDt;
   }
 
-  public void update(String answerText, Boolean correct, Instant answeredDt, QuizOption option) {
+  public void update(String answerText, Boolean correct, Instant answerDt, QuizOption option) {
     this.answerText = answerText;
     if (correct != null) {
       this.correct = correct;
     }
-    if (answeredDt != null) {
-      this.answeredDt = answeredDt;
+    if (answerDt != null) {
+      this.answerDt = answerDt;
     }
     this.option = option;
   }
