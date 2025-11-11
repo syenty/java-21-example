@@ -8,4 +8,4 @@ public record EventParticipationAnswerRequest(
     Long optionId,
     String answerText,
     Boolean correct,
-    Instant answeredDt) {}
+    Instant answerDt) {}
