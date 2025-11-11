@@ -49,7 +49,7 @@ public class EventAttendanceServiceImpl implements EventAttendanceService {
     }
 
     if (!event.isWithinParticipationWindow(now, ZONE_ID)) {
-      throw new IllegalStateException("지정된 참여 시간이 아닙니다.");
+      throw new BusinessException(ErrorCode.EVENT_PARTICIPATION_WINDOW_CLOSED);
     }
 
     EventAttendance attendance = EventAttendance.builder()

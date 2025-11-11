@@ -1,5 +1,7 @@
 package com.example.demo.participation.service.impl;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.repository.EventRepository;
 import com.example.demo.participation.domain.EventParticipation;
@@ -47,7 +49,7 @@ public class EventParticipationServiceImpl implements EventParticipationService 
   @Transactional
   public Optional<EventParticipationResponse> create(EventParticipationRequest request) {
     if (!quizService.areAllAnswersCorrect(request.eventId(), request.answers())) {
-      throw new IllegalStateException("모든 퀴즈 정답을 맞춰야 참여가 인정됩니다.");
+      throw new BusinessException(ErrorCode.QUIZ_ANSWER_INCORRECT);
     }
     return eventRepository
         .findById(request.eventId())
@@ -60,12 +62,12 @@ public class EventParticipationServiceImpl implements EventParticipationService 
                       LocalDate participationDate = LocalDate.now(ZONE_ID);
 
                       if (!event.isWithinParticipationWindow(participationInstant, ZONE_ID)) {
-                        throw new IllegalStateException("지정된 참여 시간이 아닙니다.");
+                        throw new BusinessException(ErrorCode.EVENT_PARTICIPATION_WINDOW_CLOSED);
                       }
 
                       if (eventParticipationRepository.existsByEvent_IdAndUser_IdAndParticipationDate(
                           event.getId(), user.getId(), participationDate)) {
-                        throw new IllegalStateException("이미 퀴즈를 참여했습니다.");
+                        throw new BusinessException(ErrorCode.PARTICIPATION_ALREADY_DONE);
                       }
 
                       EventParticipation participation = EventParticipation.builder()

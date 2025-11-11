@@ -98,13 +98,13 @@ public class ParticipationServiceImpl implements ParticipationService {
   private void ensureNotParticipatedToday(Long eventId, Long userId, LocalDate date) {
     if (eventParticipationRepository.existsByEvent_IdAndUser_IdAndParticipationDate(
         eventId, userId, date)) {
-      throw new IllegalStateException("이미 오늘 참여했습니다.");
+      throw new BusinessException(ErrorCode.PARTICIPATION_ALREADY_DONE);
     }
   }
 
   private void ensureAnsweredCorrectly(Long eventId, EventParticipationRequest request) {
     if (!quizService.areAllAnswersCorrect(eventId, request.answers())) {
-      throw new IllegalStateException("퀴즈 정답을 맞춰야 참여가 인정됩니다.");
+      throw new BusinessException(ErrorCode.QUIZ_ANSWER_INCORRECT);
     }
   }
 
