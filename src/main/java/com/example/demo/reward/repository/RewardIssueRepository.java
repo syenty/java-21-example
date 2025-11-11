@@ -8,4 +8,8 @@ public interface RewardIssueRepository extends JpaRepository<RewardIssue, Long> 
   long countByEvent_IdAndUser_Id(Long eventId, Long userId);
 
   boolean existsByRewardPolicy_IdAndRewardDate(Long policyId, LocalDate rewardDate);
+
+  long countByRewardPolicy_IdAndUser_Id(Long policyId, Long userId);
+
+  long countByRewardPolicy_IdAndUser_IdAndRewardDate(Long policyId, Long userId, LocalDate rewardDate);
 }

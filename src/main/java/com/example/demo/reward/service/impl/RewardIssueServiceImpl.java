@@ -157,8 +157,7 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     if (limit == null || limit <= 0) {
       return false;
     }
-    long issuedCount =
-        rewardIssueRepository.countByEvent_IdAndUser_Id(event.getId(), userId);
+    long issuedCount = rewardIssueRepository.countByEvent_IdAndUser_Id(event.getId(), userId);
     return issuedCount >= limit;
   }
 
@@ -175,6 +174,10 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     }
 
     if (hasWinnerForScope(policy, rewardDate)) {
+      return Optional.empty();
+    }
+
+    if (exceedsUserPolicyLimit(policy, participation.getUser().getId(), rewardDate)) {
       return Optional.empty();
     }
 
@@ -197,5 +200,26 @@ public class RewardIssueServiceImpl implements RewardIssueService {
 
   private boolean hasWinnerForScope(RewardPolicy policy, LocalDate rewardDate) {
     return rewardIssueRepository.existsByRewardPolicy_IdAndRewardDate(policy.getId(), rewardDate);
+  }
+
+  private boolean exceedsUserPolicyLimit(RewardPolicy policy, Long userId, LocalDate rewardDate) {
+    Integer totalLimit = policy.getUserLimitTotal();
+    if (totalLimit != null && totalLimit > 0) {
+      long totalCount = rewardIssueRepository.countByRewardPolicy_IdAndUser_Id(policy.getId(), userId);
+      if (totalCount >= totalLimit) {
+        return true;
+      }
+    }
+
+    Integer dailyLimit = policy.getUserLimitPerDay();
+    if (dailyLimit != null && dailyLimit > 0) {
+      long dailyCount = rewardIssueRepository.countByRewardPolicy_IdAndUser_IdAndRewardDate(
+          policy.getId(), userId, rewardDate);
+      if (dailyCount >= dailyLimit) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
