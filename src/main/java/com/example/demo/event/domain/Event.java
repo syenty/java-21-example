@@ -130,4 +130,15 @@ public class Event extends BaseTimeEntity {
     LocalTime currentKstTime = now.atZone(zoneId).toLocalTime();
     return !currentKstTime.isBefore(participationStartTime) && !currentKstTime.isAfter(participationEndTime);
   }
+
+  public void ensureActiveDuring(Instant utcNow) {
+    if (status != EventStatus.OPEN) {
+      throw new IllegalStateException("진행 중인 이벤트가 아닙니다.");
+    }
+    Instant eventStart = startDt.toInstant(ZoneOffset.UTC);
+    Instant eventEnd = endDt.toInstant(ZoneOffset.UTC);
+    if (utcNow.isBefore(eventStart) || utcNow.isAfter(eventEnd)) {
+      throw new IllegalStateException("이벤트 기간이 아닙니다.");
+    }
+  }
 }

@@ -12,7 +12,6 @@ public record QuizParticipationResponse(
     LocalDate participationDate,
     int dailyOrder,
     boolean correct,
-    int score,
     int correctCount,
     int totalQuestions) {
 
@@ -25,7 +24,6 @@ public record QuizParticipationResponse(
         participation.getParticipationDate(),
         participation.getDailyOrder(),
         participation.isCorrect(),
-        participation.getScore(),
         participation.getCorrectCount(),
         participation.getTotalQuestions());
   }

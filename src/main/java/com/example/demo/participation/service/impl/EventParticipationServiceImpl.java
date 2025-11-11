@@ -59,7 +59,7 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         .findById(request.userId())
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-    validateEvent(event, participationInstant);
+    event.ensureActiveDuring(participationInstant);
 
     ensureNotParticipatedToday(event.getId(), user.getId(), participationDate);
     ensureAnsweredCorrectly(event.getId(), request);
@@ -74,7 +74,6 @@ public class EventParticipationServiceImpl implements EventParticipationService 
             .participationDate(participationDate)
             .dailyOrder(dailyOrder)
             .correct(true)
-            .score(0)
             .correctCount(request.answers() != null ? request.answers().size() : 0)
             .totalQuestions(request.answers() != null ? request.answers().size() : 0)
             .build());
@@ -84,16 +83,6 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         .orElse(null);
 
     return new EventParticipationResult(QuizParticipationResponse.of(participation), reward);
-  }
-
-  private void validateEvent(Event event, Instant utcNow) {
-    if (event.getStatus() != EventStatus.OPEN) {
-      throw new IllegalStateException("진행 중인 이벤트가 아닙니다.");
-    }
-    if (utcNow.isBefore(event.getStartDt().toInstant(ZoneOffset.UTC))
-        || utcNow.isAfter(event.getEndDt().toInstant(ZoneOffset.UTC))) {
-      throw new IllegalStateException("이벤트 기간이 아닙니다.");
-    }
   }
 
   private void ensureNotParticipatedToday(Long eventId, Long userId, LocalDate date) {

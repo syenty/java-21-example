@@ -75,7 +75,6 @@ public class QuizParticipationServiceImpl implements QuizParticipationService {
                           .participationDate(participationDate)
                           .dailyOrder(1)
                           .correct(true)
-                          .score(0)
                           .correctCount(request.answers() != null ? request.answers().size() : 0)
                           .totalQuestions(request.answers() != null ? request.answers().size() : 0)
                           .build();

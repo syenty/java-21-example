@@ -168,8 +168,7 @@ public class QuizServiceImpl implements QuizService {
   }
 
   @Override
-  public boolean areAllAnswersCorrect(
-      Long eventId, List<QuizParticipationRequest.QuizAnswer> answers) {
+  public boolean areAllAnswersCorrect(Long eventId, List<QuizParticipationRequest.QuizAnswer> answers) {
     if (answers == null || answers.isEmpty()) {
       return false;
     }
