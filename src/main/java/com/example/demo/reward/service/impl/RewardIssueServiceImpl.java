@@ -169,9 +169,12 @@ public class RewardIssueServiceImpl implements RewardIssueService {
       return Optional.empty();
     }
 
-    long order = participationRepository.countByEvent_IdAndParticipationDateAndIdLessThanEqual(
-        participation.getEvent().getId(), participation.getParticipationDate(), participation.getId());
-    if (order != targetOrder) {
+    long order = determineParticipationOrder(policy, participation);
+    if (order < targetOrder) {
+      return Optional.empty();
+    }
+
+    if (hasWinnerForScope(policy, rewardDate)) {
       return Optional.empty();
     }
 
@@ -184,5 +187,15 @@ public class RewardIssueServiceImpl implements RewardIssueService {
         .build();
 
     return Optional.of(RewardIssueResponse.of(rewardIssueRepository.save(issue)));
+  }
+
+  private long determineParticipationOrder(RewardPolicy policy, QuizParticipation participation) {
+    // 현재는 일별 스코프만 지원
+    return participationRepository.countByEvent_IdAndParticipationDateAndIdLessThanEqual(
+        participation.getEvent().getId(), participation.getParticipationDate(), participation.getId());
+  }
+
+  private boolean hasWinnerForScope(RewardPolicy policy, LocalDate rewardDate) {
+    return rewardIssueRepository.existsByRewardPolicy_IdAndRewardDate(policy.getId(), rewardDate);
   }
 }
