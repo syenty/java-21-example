@@ -1,5 +1,7 @@
 package com.example.demo.participation.service.impl;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.common.util.DateUtil;
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.domain.EventDailySequence;
@@ -59,11 +61,11 @@ public class ParticipationServiceImpl implements ParticipationService {
 
     Event event = eventRepository
         .findById(request.eventId())
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이벤트입니다."));
+        .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
 
     User user = userRepository
         .findById(request.userId())
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
     event.ensureActiveDuring(participationInstant);
 
@@ -143,22 +145,22 @@ public class ParticipationServiceImpl implements ParticipationService {
       Instant answeredAt) {
 
     if (answer == null || answer.quizId() == null) {
-      throw new IllegalArgumentException("퀴즈 정보가 올바르지 않습니다.");
+      throw new BusinessException(ErrorCode.QUIZ_INFO_INVALID);
     }
 
     Quiz quiz = quizRepository.findById(answer.quizId())
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 퀴즈입니다."));
+        .orElseThrow(() -> new BusinessException(ErrorCode.QUIZ_NOT_FOUND));
 
     if (!quiz.getEvent().getId().equals(participation.getEvent().getId())) {
-      throw new IllegalArgumentException("해당 이벤트의 퀴즈만 응답할 수 있습니다.");
+      throw new BusinessException(ErrorCode.QUIZ_EVENT_MISMATCH);
     }
 
     QuizOption option = null;
     if (answer.optionId() != null) {
       option = quizOptionRepository.findById(answer.optionId())
-          .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 선택지입니다."));
+          .orElseThrow(() -> new BusinessException(ErrorCode.QUIZ_OPTION_NOT_FOUND));
       if (!option.getQuiz().getId().equals(quiz.getId())) {
-        throw new IllegalArgumentException("퀴즈와 선택지가 일치하지 않습니다.");
+        throw new BusinessException(ErrorCode.QUIZ_OPTION_MISMATCH);
       }
     }
 
