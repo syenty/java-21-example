@@ -1,5 +1,7 @@
 package com.example.demo.quiz.service.impl;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.event.repository.EventRepository;
 import com.example.demo.participation.dto.EventParticipationRequest;
 import com.example.demo.quiz.domain.Quiz;
@@ -53,7 +55,7 @@ public class QuizServiceImpl implements QuizService {
   @Transactional
   public Optional<QuizAdminResponse> create(QuizRequest request) {
     if (request.quizDate() == null) {
-      throw new IllegalArgumentException("quizDate is required");
+      throw new BusinessException(ErrorCode.QUIZ_DATE_REQUIRED);
     }
     return eventRepository
         .findById(request.eventId())

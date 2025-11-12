@@ -4,10 +4,12 @@ import com.example.demo.common.auth.dto.EventAttendanceLoginRequest;
 import com.example.demo.common.auth.dto.LoginRequest;
 import com.example.demo.common.auth.dto.TokenResponse;
 import com.example.demo.common.auth.dto.UserEmployeeLoginRequest;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
+import com.example.demo.common.jwt.JwtTokenProvider;
 import com.example.demo.event.service.EventAttendanceService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.service.UserService;
-import com.example.demo.common.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -38,7 +40,7 @@ public class AuthService {
 
   public TokenResponse userLogin(UserEmployeeLoginRequest request) {
     User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
-        .orElseThrow(() -> new IllegalArgumentException("User not found for provided credentials"));
+        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
     Authentication authentication = new UsernamePasswordAuthenticationToken(
         user.getExternalId(),
@@ -51,10 +53,10 @@ public class AuthService {
 
   public TokenResponse eventAttendanceLogin(EventAttendanceLoginRequest request) {
     if (request.getEventId() == null) {
-      throw new IllegalArgumentException("eventId is required for attendance.");
+      throw new BusinessException(ErrorCode.EVENT_ID_REQUIRED);
     }
     User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
-        .orElseThrow(() -> new IllegalArgumentException("User not found for provided credentials"));
+        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
     eventAttendanceService.attend(request.getEventId(), user.getId());
 

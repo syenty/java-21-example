@@ -1,5 +1,7 @@
 package com.example.demo.event.service.impl;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.dto.EventRequest;
 import com.example.demo.event.dto.EventResponse;
@@ -32,7 +34,7 @@ public class EventServiceImpl implements EventService {
   @Transactional
   public EventResponse create(EventRequest request) {
     if (request.participationStartTime() == null || request.participationEndTime() == null) {
-      throw new IllegalArgumentException("참여 가능 시간은 반드시 입력되어야 합니다.");
+      throw new BusinessException(ErrorCode.EVENT_PARTICIPATION_TIME_REQUIRED);
     }
     Event event =
         Event.builder()
