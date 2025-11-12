@@ -1,9 +1,12 @@
 package com.example.demo.reward.controller;
 
+import com.example.demo.common.util.DateUtil;
 import com.example.demo.reward.dto.RewardIssueRequest;
 import com.example.demo.reward.dto.RewardIssueResponse;
 import com.example.demo.reward.service.RewardIssueService;
+import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -58,5 +62,17 @@ public class RewardIssueController {
     return rewardIssueService.delete(id)
         ? ResponseEntity.noContent().build()
         : ResponseEntity.notFound().build();
+  }
+
+  @GetMapping("/export")
+  public void exportRewardIssues(
+      @RequestParam(required = false) Long eventId,
+      @RequestParam String startDt,
+      @RequestParam String endDt,
+      HttpServletResponse response) {
+
+    Instant start = DateUtil.parseUtcDateTime(startDt);
+    Instant end = DateUtil.parseUtcDateTime(endDt);
+    rewardIssueService.downloadExcel(eventId, start, end, response);
   }
 }

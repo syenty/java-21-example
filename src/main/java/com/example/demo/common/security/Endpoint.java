@@ -52,7 +52,8 @@ public final class Endpoint {
       Map.entry("/api/reward-policies", new String[] { "GET", "POST" }),
       Map.entry("/api/reward-policies/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/reward-issues", new String[] { "GET", "POST" }),
-      Map.entry("/api/reward-issues/{id}", new String[] { "GET", "PUT", "DELETE" }));
+      Map.entry("/api/reward-issues/{id}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/reward-issues/export", new String[] { "GET" }));
 
   public static final Map<String, String[]> USER_URLS = Map.ofEntries(
       Map.entry("/api/users/external/{externalId}", new String[] { "GET" }),
@@ -71,7 +72,4 @@ public final class Endpoint {
       Map.entry("/api/reward-issues/{id}", new String[] { "GET" }),
       Map.entry("/api/participations", new String[] { "POST" }));
 
-  public static String[] urlPatternsFor(Map<String, String[]> endpointMap) {
-    return endpointMap.keySet().toArray(new String[0]);
-  }
 }
