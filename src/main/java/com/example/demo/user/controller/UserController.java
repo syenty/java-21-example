@@ -2,6 +2,7 @@ package com.example.demo.user.controller;
 
 import com.example.demo.user.domain.User;
 import com.example.demo.user.dto.UserBlockedRequest;
+import com.example.demo.user.dto.UserUpdateRequest;
 import com.example.demo.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -52,8 +53,8 @@ public class UserController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
-    return service.update(id, user)
+  public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
+    return service.update(id, request)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
   }

@@ -37,9 +37,8 @@ public class User extends BaseTimeEntity {
   @Column(nullable = false)
   private boolean blocked = false;
 
-  public void update(String name, String phoneNumber, String employeeNumber) {
+  public void update(String name, String employeeNumber) {
     this.name = name;
-    this.phoneNumber = phoneNumber;
     this.employeeNumber = employeeNumber;
   }
 

@@ -1,6 +1,7 @@
 package com.example.demo.user.service.impl;
 
 import com.example.demo.user.domain.User;
+import com.example.demo.user.dto.UserUpdateRequest;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.UserService;
 
@@ -49,11 +50,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> update(Long id, User user) {
-    return repository.findById(id).map(existing -> {
-      existing.update(user.getName(), user.getPhoneNumber(), user.getEmployeeNumber());
-      return repository.save(existing);
-    });
+  public Optional<User> update(Long id, UserUpdateRequest request) {
+    return repository.findById(id)
+        .map(existing -> {
+          existing.update(request.name(), request.employeeNumber());
+          return repository.save(existing);
+        });
   }
 
   @Override
