@@ -12,5 +12,6 @@ public interface UserService {
     Optional<User> getByEmployeeNumberAndName(String employeeNumber, String name);
     User create(User user);
     Optional<User> update(Long id, User user);
+    Optional<User> updateBlocked(Long id, boolean blocked);
     boolean delete(Long id);
 }

@@ -34,6 +34,9 @@ public class User extends BaseTimeEntity {
   @Column(name = "external_id", nullable = false, unique = true)
   private String externalId;
 
+  @Column(nullable = false)
+  private boolean blocked = false;
+
   public void update(String name, String phoneNumber, String employeeNumber) {
     this.name = name;
     this.phoneNumber = phoneNumber;
@@ -45,10 +48,16 @@ public class User extends BaseTimeEntity {
       final String name,
       final String phoneNumber,
       final String employeeNumber,
-      final String externalId) {
+      final String externalId,
+      final Boolean blocked) {
     this.name = name;
     this.phoneNumber = phoneNumber;
     this.employeeNumber = employeeNumber;
     this.externalId = externalId;
+    this.blocked = blocked != null ? blocked : false;
+  }
+
+  public void setBlocked(boolean blocked) {
+    this.blocked = blocked;
   }
 }

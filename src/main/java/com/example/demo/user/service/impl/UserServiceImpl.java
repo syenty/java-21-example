@@ -57,6 +57,15 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public Optional<User> updateBlocked(Long id, boolean blocked) {
+    return repository.findById(id)
+        .map(existing -> {
+          existing.setBlocked(blocked);
+          return repository.save(existing);
+        });
+  }
+
+  @Override
   public boolean delete(Long id) {
     if (!repository.existsById(id))
       return false;
