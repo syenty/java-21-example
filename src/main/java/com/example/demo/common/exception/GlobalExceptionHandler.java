@@ -1,6 +1,8 @@
 package com.example.demo.common.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -15,15 +17,23 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(BusinessException.class)
   public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
-    ErrorCode errorCode = ex.getErrorCode();
+    return buildResponse(ex.getErrorCode());
+  }
 
-    ErrorResponse body = new ErrorResponse(
-        errorCode.getCode(),
-        errorCode.getMessage());
+  /**
+   * 인증 실패 (잘못된 자격 증명)
+   */
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+    return buildResponse(ErrorCode.AUTH_BAD_CREDENTIALS);
+  }
 
-    return ResponseEntity
-        .status(errorCode.getStatus())
-        .body(body);
+  /**
+   * 인가 실패 (권한 부족)
+   */
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+    return buildResponse(ErrorCode.AUTH_FORBIDDEN);
   }
 
   /**
@@ -32,9 +42,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception ex) {
     log.error("Unexpected error", ex);
+    return buildResponse(ErrorCode.INTERNAL_ERROR);
+  }
 
-    ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
-
+  private ResponseEntity<ErrorResponse> buildResponse(ErrorCode errorCode) {
     ErrorResponse body = new ErrorResponse(
         errorCode.getCode(),
         errorCode.getMessage());

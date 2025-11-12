@@ -23,6 +23,7 @@ public enum ErrorCode {
   AUTH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "인증이 필요합니다."),
   AUTH_FORBIDDEN(HttpStatus.FORBIDDEN, "A002", "접근 권한이 없습니다."),
   AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A003", "유효하지 않은 토큰입니다."),
+  AUTH_BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A004", "아이디 또는 비밀번호가 올바르지 않습니다."),
 
   QUIZ_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "Q001", "퀴즈 일자는 필수입니다."),
   QUIZ_INFO_INVALID(HttpStatus.BAD_REQUEST, "Q002", "퀴즈 정보가 올바르지 않습니다."),
