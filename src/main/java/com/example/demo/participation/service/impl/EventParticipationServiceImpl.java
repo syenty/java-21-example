@@ -2,16 +2,21 @@ package com.example.demo.participation.service.impl;
 
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
+import com.example.demo.common.util.DateUtil;
+import com.example.demo.common.util.ExcelUtil;
+import com.example.demo.common.util.StringUtil;
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.repository.EventRepository;
 import com.example.demo.participation.domain.EventParticipation;
 import com.example.demo.participation.dto.EventParticipationRequest;
 import com.example.demo.participation.dto.EventParticipationResponse;
+import com.example.demo.participation.dto.EventParticipationExcelRow;
 import com.example.demo.participation.repository.EventParticipationRepository;
 import com.example.demo.participation.service.EventParticipationService;
 import com.example.demo.quiz.service.QuizService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -27,6 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventParticipationServiceImpl implements EventParticipationService {
 
   private static final ZoneId ZONE_ID = ZoneId.of("Asia/Seoul");
+  private static final List<String> PARTICIPATION_HEADERS = List.of(
+      "participationDt",
+      "participationDate",
+      "dailyOrder",
+      "name",
+      "employeeNumber");
 
   private final EventParticipationRepository eventParticipationRepository;
   private final EventRepository eventRepository;
@@ -121,5 +132,29 @@ public class EventParticipationServiceImpl implements EventParticipationService 
     }
     eventParticipationRepository.deleteById(id);
     return true;
+  }
+
+  @Override
+  public void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response) {
+    if (start == null || end == null || start.isAfter(end)) {
+      throw new IllegalArgumentException("유효한 기간이 필요합니다.");
+    }
+
+    List<EventParticipationExcelRow> rows = eventParticipationRepository.findExcelRows(eventId, start, end);
+
+    List<List<String>> body = rows.stream()
+        .map(row -> List.of(
+            StringUtil.formatLocalDateTime(DateUtil.toAsiaSeoulDateTime(row.participationDt())),
+            StringUtil.formatLocalDate(row.participationDate()),
+            Integer.toString(row.dailyOrder()),
+            StringUtil.defaultString(row.name()),
+            StringUtil.defaultString(row.employeeNumber())))
+        .toList();
+
+    ExcelUtil.downloadXlsx(
+        response,
+        "event-participations.xlsx",
+        PARTICIPATION_HEADERS,
+        body);
   }
 }

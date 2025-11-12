@@ -43,6 +43,7 @@ public final class Endpoint {
       Map.entry("/api/quiz-options/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/event-participations", new String[] { "GET", "POST" }),
       Map.entry("/api/event-participations/{id}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/event-participations/export", new String[] { "GET" }),
       Map.entry("/api/event-participation-answers", new String[] { "GET", "POST" }),
       Map.entry("/api/event-participation-answers/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/reward-policies", new String[] { "GET", "POST" }),
