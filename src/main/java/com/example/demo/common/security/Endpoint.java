@@ -36,6 +36,9 @@ public final class Endpoint {
       Map.entry("/api/events/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/events/{eventId}/sequences", new String[] { "GET", "POST" }),
       Map.entry("/api/events/{eventId}/sequences/{seqDate}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/events/{eventId}/attendance", new String[] { "GET" }),
+      Map.entry("/api/events/{eventId}/attendance/export", new String[] { "GET" }),
+
       Map.entry("/api/quizzes", new String[] { "GET", "POST" }),
       Map.entry("/api/quizzes/{id}", new String[] { "GET", "PUT", "DELETE" }),
 
