@@ -62,7 +62,7 @@ public class User extends BaseTimeEntity {
     this.blocked = blocked != null ? blocked : false;
   }
 
-  public void setBlocked(boolean blocked) {
+  public void changeBlocked(boolean blocked) {
     this.blocked = blocked;
   }
 }

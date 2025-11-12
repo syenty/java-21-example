@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
   public Optional<User> updateBlocked(Long id, boolean blocked) {
     return repository.findById(id)
         .map(existing -> {
-          existing.setBlocked(blocked);
+          existing.changeBlocked(blocked);
           return repository.save(existing);
         });
   }
