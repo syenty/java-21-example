@@ -1,10 +1,14 @@
 package com.example.demo.common.jwt;
 
+import com.example.demo.common.exception.ErrorCode;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
+    public static final String AUTH_ERROR_CODE_ATTR = "AUTH_ERROR_CODE";
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -30,6 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Authentication authentication = jwtTokenProvider.getAuthentication(jwt); // 토큰을 파싱하여 인증 객체를 가져옴
             if (authentication != null) { // 인증 객체가 성공적으로 생성된 경우 (토큰이 유효한 경우)
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                request.setAttribute(AUTH_ERROR_CODE_ATTR, ErrorCode.AUTH_INVALID_TOKEN);
             }
         }
 

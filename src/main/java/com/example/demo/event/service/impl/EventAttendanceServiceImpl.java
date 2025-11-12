@@ -1,5 +1,7 @@
 package com.example.demo.event.service.impl;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.domain.EventAttendance;
 import com.example.demo.event.dto.EventAttendanceResponse;
@@ -32,10 +34,10 @@ public class EventAttendanceServiceImpl implements EventAttendanceService {
   public EventAttendanceResponse attend(Long eventId, Long userId) {
     Event event = eventRepository
         .findById(eventId)
-        .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
+        .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
     User user = userRepository
         .findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
     Instant now = Instant.now();
     LocalDate today = LocalDate.now(ZONE_ID);
@@ -47,7 +49,7 @@ public class EventAttendanceServiceImpl implements EventAttendanceService {
     }
 
     if (!event.isWithinParticipationWindow(now, ZONE_ID)) {
-      throw new IllegalStateException("지정된 참여 시간이 아닙니다.");
+      throw new BusinessException(ErrorCode.EVENT_PARTICIPATION_WINDOW_CLOSED);
     }
 
     EventAttendance attendance = EventAttendance.builder()

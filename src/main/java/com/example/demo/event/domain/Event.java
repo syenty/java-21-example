@@ -1,6 +1,8 @@
 package com.example.demo.event.domain;
 
 import com.example.demo.common.domain.BaseTimeEntity;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -133,12 +135,12 @@ public class Event extends BaseTimeEntity {
 
   public void ensureActiveDuring(Instant utcNow) {
     if (status != EventStatus.OPEN) {
-      throw new IllegalStateException("진행 중인 이벤트가 아닙니다.");
+      throw new BusinessException(ErrorCode.EVENT_NOT_ACTIVE);
     }
     Instant eventStart = startDt.toInstant(ZoneOffset.UTC);
     Instant eventEnd = endDt.toInstant(ZoneOffset.UTC);
     if (utcNow.isBefore(eventStart) || utcNow.isAfter(eventEnd)) {
-      throw new IllegalStateException("이벤트 기간이 아닙니다.");
+      throw new BusinessException(ErrorCode.EVENT_PERIOD_INVALID);
     }
   }
 }

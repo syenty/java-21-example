@@ -1,5 +1,7 @@
 package com.example.demo.reward.service.impl;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.event.repository.EventRepository;
 import com.example.demo.reward.domain.RewardPolicy;
 import com.example.demo.reward.domain.RewardPolicyNthScope;
@@ -167,14 +169,14 @@ public class RewardPolicyServiceImpl implements RewardPolicyService {
   private void validatePolicyRequirements(
       RewardPolicyType policyType, Integer targetOrder, RewardPolicyNthScope nthScope) {
     if (policyType == null) {
-      throw new IllegalArgumentException("policyType must be provided");
+      throw new BusinessException(ErrorCode.REWARD_POLICY_TYPE_REQUIRED);
     }
     if (policyType == RewardPolicyType.NTH_ORDER) {
       if (targetOrder == null || targetOrder <= 0) {
-        throw new IllegalArgumentException("targetOrder must be a positive integer");
+        throw new BusinessException(ErrorCode.REWARD_POLICY_TARGET_ORDER_INVALID);
       }
       if (nthScope == null) {
-        throw new IllegalArgumentException("nthScope is required for NTH_ORDER policies");
+        throw new BusinessException(ErrorCode.REWARD_POLICY_NTH_SCOPE_REQUIRED);
       }
     }
   }
