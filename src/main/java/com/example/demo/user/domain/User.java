@@ -31,15 +31,19 @@ public class User extends BaseTimeEntity {
   @Column(nullable = false)
   private String employeeNumber;
 
+  @Column(name = "branch_code", length = 50)
+  private String branchCode;
+
   @Column(name = "external_id", nullable = false, unique = true)
   private String externalId;
 
   @Column(nullable = false)
   private boolean blocked = false;
 
-  public void update(String name, String employeeNumber) {
+  public void update(String name, String employeeNumber, String branchCode) {
     this.name = name;
     this.employeeNumber = employeeNumber;
+    this.branchCode = branchCode;
   }
 
   @Builder
@@ -47,11 +51,13 @@ public class User extends BaseTimeEntity {
       final String name,
       final String phoneNumber,
       final String employeeNumber,
+      final String branchCode,
       final String externalId,
       final Boolean blocked) {
     this.name = name;
     this.phoneNumber = phoneNumber;
     this.employeeNumber = employeeNumber;
+    this.branchCode = branchCode;
     this.externalId = externalId;
     this.blocked = blocked != null ? blocked : false;
   }

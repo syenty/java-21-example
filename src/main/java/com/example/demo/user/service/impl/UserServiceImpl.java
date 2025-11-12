@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
         .name(user.getName())
         .phoneNumber(user.getPhoneNumber())
         .employeeNumber(user.getEmployeeNumber())
+        .branchCode(user.getBranchCode())
         .externalId(UUID.randomUUID().toString())
         .build();
     return repository.save(toSave);
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
   public Optional<User> update(Long id, UserUpdateRequest request) {
     return repository.findById(id)
         .map(existing -> {
-          existing.update(request.name(), request.employeeNumber());
+          existing.update(request.name(), request.employeeNumber(), request.branchCode());
           return repository.save(existing);
         });
   }
