@@ -25,7 +25,10 @@ public final class Endpoint {
       Map.entry("/webjars/swagger-ui/*", new String[] { "GET" }),
       Map.entry("/api/auth/admin-login", new String[] { "POST" }),
       Map.entry("/api/auth/user-login", new String[] { "POST" }),
-      Map.entry("/api/auth/event-login", new String[] { "POST" }));
+      Map.entry("/api/auth/event-login", new String[] { "POST" }),
+      Map.entry("/api/users/lookup", new String[] { "GET" }),
+      Map.entry("/api/users/external/{externalId}", new String[] { "GET" })
+  );
 
   public static final Map<String, String[]> ADMIN_URLS = Map.ofEntries(
       Map.entry("/api/admins", new String[] { "GET", "POST" }),
@@ -56,7 +59,6 @@ public final class Endpoint {
       Map.entry("/api/reward-issues/export", new String[] { "GET" }));
 
   public static final Map<String, String[]> USER_URLS = Map.ofEntries(
-      Map.entry("/api/users/external/{externalId}", new String[] { "GET" }),
       Map.entry("/api/events", new String[] { "GET" }),
       Map.entry("/api/events/{id}", new String[] { "GET" }),
       Map.entry("/api/events/{eventId}/sequences", new String[] { "GET" }),

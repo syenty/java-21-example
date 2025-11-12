@@ -11,6 +11,7 @@ public interface UserService {
     Optional<User> getById(Long id);
     Optional<User> getByExternalId(String externalId);
     Optional<User> getByEmployeeNumberAndName(String employeeNumber, String name);
+    User getRequiredByEmployeeNumberAndName(String employeeNumber, String name);
     User create(User user);
     Optional<User> update(Long id, UserUpdateRequest request);
     Optional<User> updateBlocked(Long id, boolean blocked);

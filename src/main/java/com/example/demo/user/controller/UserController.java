@@ -2,6 +2,7 @@ package com.example.demo.user.controller;
 
 import com.example.demo.user.domain.User;
 import com.example.demo.user.dto.UserBlockedRequest;
+import com.example.demo.user.dto.UserLookupResponse;
 import com.example.demo.user.dto.UserUpdateRequest;
 import com.example.demo.user.service.UserService;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +39,14 @@ public class UserController {
     return service.getById(id)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
+  }
+ 
+  @GetMapping("/lookup")
+  public ResponseEntity<UserLookupResponse> findOrCreate(
+      @RequestParam String name,
+      @RequestParam String employeeNumber) {
+    User user = service.getRequiredByEmployeeNumberAndName(employeeNumber, name);
+    return ResponseEntity.ok(new UserLookupResponse(user.getExternalId()));
   }
 
   @GetMapping("/external/{externalId}")
