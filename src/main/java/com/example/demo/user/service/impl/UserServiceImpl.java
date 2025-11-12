@@ -8,10 +8,9 @@ import com.example.demo.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -46,6 +45,9 @@ public class UserServiceImpl implements UserService {
         .employeeNumber(user.getEmployeeNumber())
         .branchCode(user.getBranchCode())
         .externalId(UUID.randomUUID().toString())
+        .blocked(user.isBlocked())
+        .phoneVerified(user.isPhoneVerified())
+        .phoneVerifiedDt(user.getPhoneVerifiedDt())
         .build();
     return repository.save(toSave);
   }
@@ -74,5 +76,22 @@ public class UserServiceImpl implements UserService {
       return false;
     repository.deleteById(id);
     return true;
+  }
+
+  @Override
+  @Transactional
+  public User findOrCreateByNameAndEmployeeNumber(String name, String employeeNumber) {
+    return repository.findByEmployeeNumberAndName(employeeNumber, name)
+        .orElseGet(() -> repository.save(
+            User.builder()
+                .name(name)
+                .phoneNumber(employeeNumber)
+                .employeeNumber(employeeNumber)
+                .branchCode(null)
+                .externalId(UUID.randomUUID().toString())
+                .blocked(false)
+                .phoneVerified(false)
+                .phoneVerifiedDt(null)
+                .build()));
   }
 }

@@ -1,7 +1,6 @@
 package com.example.demo.user.domain;
 
 import com.example.demo.common.domain.BaseTimeEntity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +42,12 @@ public class User extends BaseTimeEntity {
   @Column(nullable = false)
   private boolean blocked = false;
 
+  @Column(name = "phone_verified", nullable = false)
+  private boolean phoneVerified = false;
+
+  @Column(name = "phone_verified_dt")
+  private Instant phoneVerifiedDt;
+
   public void update(String name, String employeeNumber, String branchCode) {
     this.name = name;
     this.employeeNumber = employeeNumber;
@@ -55,16 +61,25 @@ public class User extends BaseTimeEntity {
       final String employeeNumber,
       final String branchCode,
       final String externalId,
-      final Boolean blocked) {
+      final Boolean blocked,
+      final Boolean phoneVerified,
+      final Instant phoneVerifiedDt) {
     this.name = name;
     this.phoneNumber = phoneNumber;
     this.employeeNumber = employeeNumber;
     this.branchCode = branchCode;
     this.externalId = externalId;
     this.blocked = blocked != null ? blocked : false;
+    this.phoneVerified = phoneVerified != null ? phoneVerified : false;
+    this.phoneVerifiedDt = phoneVerifiedDt;
   }
 
   public void changeBlocked(boolean blocked) {
     this.blocked = blocked;
+  }
+
+  public void changePhoneVerification(boolean verified, Instant verifiedDt) {
+    this.phoneVerified = verified;
+    this.phoneVerifiedDt = verified ? verifiedDt : null;
   }
 }
