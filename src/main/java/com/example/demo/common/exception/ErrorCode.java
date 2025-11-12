@@ -12,6 +12,7 @@ public enum ErrorCode {
   INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C999", "서버 에러가 발생했습니다."),
 
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "존재하지 않는 사용자입니다."),
+  USER_BLOCKED(HttpStatus.FORBIDDEN, "U002", "차단된 사용자입니다."),
 
   EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "E001", "존재하지 않는 이벤트입니다."),
   EVENT_PARTICIPATION_TIME_REQUIRED(HttpStatus.BAD_REQUEST, "E002", "참여 가능 시간은 반드시 입력되어야 합니다."),
