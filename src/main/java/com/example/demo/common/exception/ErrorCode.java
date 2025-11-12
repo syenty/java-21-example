@@ -20,6 +20,10 @@ public enum ErrorCode {
   EVENT_PERIOD_INVALID(HttpStatus.BAD_REQUEST, "E005", "이벤트 기간이 아닙니다."),
   EVENT_PARTICIPATION_WINDOW_CLOSED(HttpStatus.BAD_REQUEST, "E006", "지정된 참여 시간이 아닙니다."),
 
+  AUTH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A001", "인증이 필요합니다."),
+  AUTH_FORBIDDEN(HttpStatus.FORBIDDEN, "A002", "접근 권한이 없습니다."),
+  AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A003", "유효하지 않은 토큰입니다."),
+
   QUIZ_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "Q001", "퀴즈 일자는 필수입니다."),
   QUIZ_INFO_INVALID(HttpStatus.BAD_REQUEST, "Q002", "퀴즈 정보가 올바르지 않습니다."),
   QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "Q003", "존재하지 않는 퀴즈입니다."),
