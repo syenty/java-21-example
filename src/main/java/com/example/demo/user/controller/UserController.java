@@ -45,8 +45,8 @@ public class UserController {
   public ResponseEntity<UserLookupResponse> findOrCreate(
       @RequestParam String name,
       @RequestParam String employeeNumber) {
-    User user = service.findOrCreateByNameAndEmployeeNumber(name, employeeNumber);
-    return ResponseEntity.ok(new UserLookupResponse(user.getExternalId(), user.isPhoneVerified()));
+    User user = service.getRequiredByEmployeeNumberAndName(employeeNumber, name);
+    return ResponseEntity.ok(new UserLookupResponse(user.getExternalId()));
   }
 
   @GetMapping("/external/{externalId}")

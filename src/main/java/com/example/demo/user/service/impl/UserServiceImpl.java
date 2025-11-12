@@ -1,5 +1,7 @@
 package com.example.demo.user.service.impl;
 
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.dto.UserUpdateRequest;
 import com.example.demo.user.repository.UserRepository;
@@ -10,7 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -36,6 +37,12 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getByEmployeeNumberAndName(String employeeNumber, String name) {
         return repository.findByEmployeeNumberAndName(employeeNumber, name);
     }
+  
+  @Override
+  public User getRequiredByEmployeeNumberAndName(String employeeNumber, String name) {
+    return repository.findByEmployeeNumberAndName(employeeNumber, name)
+        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+  }
 
   @Override
   public User create(User user) {
@@ -76,22 +83,5 @@ public class UserServiceImpl implements UserService {
       return false;
     repository.deleteById(id);
     return true;
-  }
-
-  @Override
-  @Transactional
-  public User findOrCreateByNameAndEmployeeNumber(String name, String employeeNumber) {
-    return repository.findByEmployeeNumberAndName(employeeNumber, name)
-        .orElseGet(() -> repository.save(
-            User.builder()
-                .name(name)
-                .phoneNumber(employeeNumber)
-                .employeeNumber(employeeNumber)
-                .branchCode(null)
-                .externalId(UUID.randomUUID().toString())
-                .blocked(false)
-                .phoneVerified(false)
-                .phoneVerifiedDt(null)
-                .build()));
   }
 }

@@ -1,4 +1,4 @@
 package com.example.demo.user.dto;
 
-public record UserLookupResponse(String externalId, boolean phoneVerified) {
+public record UserLookupResponse(String externalId) {
 }
