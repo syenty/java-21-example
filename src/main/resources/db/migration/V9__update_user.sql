@@ -1,0 +1,2 @@
+ALTER TABLE `user`
+    ADD COLUMN blocked BOOLEAN NOT NULL DEFAULT FALSE AFTER external_id;

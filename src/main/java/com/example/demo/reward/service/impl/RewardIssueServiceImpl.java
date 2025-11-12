@@ -1,11 +1,14 @@
 package com.example.demo.reward.service.impl;
 
+import com.example.demo.common.util.ExcelUtil;
+import com.example.demo.common.util.StringUtil;
 import com.example.demo.event.domain.Event;
 import com.example.demo.event.repository.EventRepository;
 import com.example.demo.participation.domain.EventParticipation;
 import com.example.demo.participation.repository.EventParticipationRepository;
 import com.example.demo.reward.domain.RewardIssue;
 import com.example.demo.reward.domain.RewardPolicy;
+import com.example.demo.reward.dto.RewardIssueExcelRow;
 import com.example.demo.reward.dto.RewardIssueRequest;
 import com.example.demo.reward.dto.RewardIssueResponse;
 import com.example.demo.reward.repository.RewardIssueRepository;
@@ -13,6 +16,8 @@ import com.example.demo.reward.repository.RewardPolicyRepository;
 import com.example.demo.reward.service.RewardIssueService;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +35,13 @@ public class RewardIssueServiceImpl implements RewardIssueService {
   private final UserRepository userRepository;
   private final EventParticipationRepository participationRepository;
   private final RewardPolicyRepository rewardPolicyRepository;
+
+  private static final List<String> ISSUE_HEADERS = List.of(
+      "rewardIssuedDt",
+      "rewardDate",
+      "userName",
+      "employeeNumber",
+      "policyName");
 
   @Override
   public List<RewardIssueResponse> findAll() {
@@ -218,5 +230,32 @@ public class RewardIssueServiceImpl implements RewardIssueService {
     }
 
     return false;
+  }
+
+  @Override
+  public void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response) {
+    validatePeriod(start, end);
+    List<RewardIssueExcelRow> rows = rewardIssueRepository.findExcelRows(eventId, start, end);
+
+    List<List<String>> body = rows.stream()
+        .map(row -> List.of(
+            StringUtil.formatInstant(row.rewardIssuedDt()),
+            StringUtil.formatLocalDate(row.rewardDate()),
+            StringUtil.defaultString(row.userName()),
+            StringUtil.defaultString(row.employeeNumber()),
+            StringUtil.defaultString(row.policyName())))
+        .toList();
+
+    ExcelUtil.downloadXlsx(
+        response,
+        "reward-issues.xlsx",
+        ISSUE_HEADERS,
+        body);
+  }
+
+  private void validatePeriod(Instant start, Instant end) {
+    if (start == null || end == null || start.isAfter(end)) {
+      throw new IllegalArgumentException("유효한 기간이 필요합니다.");
+    }
   }
 }

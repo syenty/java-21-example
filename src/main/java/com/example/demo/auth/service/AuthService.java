@@ -41,6 +41,7 @@ public class AuthService {
   public TokenResponse userLogin(UserEmployeeLoginRequest request) {
     User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
         .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    ensureNotBlocked(user);
 
     Authentication authentication = new UsernamePasswordAuthenticationToken(
         user.getExternalId(),
@@ -57,6 +58,7 @@ public class AuthService {
     }
     User user = userService.getByEmployeeNumberAndName(request.getEmployeeNumber(), request.getName())
         .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    ensureNotBlocked(user);
 
     eventAttendanceService.attend(request.getEventId(), user.getId());
 
@@ -67,5 +69,11 @@ public class AuthService {
 
     String accessToken = jwtTokenProvider.createToken(authentication);
     return new TokenResponse(accessToken);
+  }
+
+  private void ensureNotBlocked(User user) {
+    if (user.isBlocked()) {
+      throw new BusinessException(ErrorCode.USER_BLOCKED);
+    }
   }
 }

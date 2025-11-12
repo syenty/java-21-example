@@ -1,6 +1,7 @@
 package com.example.demo.user.service.impl;
 
 import com.example.demo.user.domain.User;
+import com.example.demo.user.dto.UserUpdateRequest;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.UserService;
 
@@ -43,17 +44,28 @@ public class UserServiceImpl implements UserService {
         .name(user.getName())
         .phoneNumber(user.getPhoneNumber())
         .employeeNumber(user.getEmployeeNumber())
+        .branchCode(user.getBranchCode())
         .externalId(UUID.randomUUID().toString())
         .build();
     return repository.save(toSave);
   }
 
   @Override
-  public Optional<User> update(Long id, User user) {
-    return repository.findById(id).map(existing -> {
-      existing.update(user.getName(), user.getPhoneNumber(), user.getEmployeeNumber());
-      return repository.save(existing);
-    });
+  public Optional<User> update(Long id, UserUpdateRequest request) {
+    return repository.findById(id)
+        .map(existing -> {
+          existing.update(request.name(), request.employeeNumber(), request.branchCode());
+          return repository.save(existing);
+        });
+  }
+
+  @Override
+  public Optional<User> updateBlocked(Long id, boolean blocked) {
+    return repository.findById(id)
+        .map(existing -> {
+          existing.changeBlocked(blocked);
+          return repository.save(existing);
+        });
   }
 
   @Override

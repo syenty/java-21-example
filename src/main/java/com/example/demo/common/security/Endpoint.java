@@ -36,6 +36,9 @@ public final class Endpoint {
       Map.entry("/api/events/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/events/{eventId}/sequences", new String[] { "GET", "POST" }),
       Map.entry("/api/events/{eventId}/sequences/{seqDate}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/events/{eventId}/attendance", new String[] { "GET" }),
+      Map.entry("/api/events/{eventId}/attendance/export", new String[] { "GET" }),
+
       Map.entry("/api/quizzes", new String[] { "GET", "POST" }),
       Map.entry("/api/quizzes/{id}", new String[] { "GET", "PUT", "DELETE" }),
 
@@ -43,12 +46,14 @@ public final class Endpoint {
       Map.entry("/api/quiz-options/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/event-participations", new String[] { "GET", "POST" }),
       Map.entry("/api/event-participations/{id}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/event-participations/export", new String[] { "GET" }),
       Map.entry("/api/event-participation-answers", new String[] { "GET", "POST" }),
       Map.entry("/api/event-participation-answers/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/reward-policies", new String[] { "GET", "POST" }),
       Map.entry("/api/reward-policies/{id}", new String[] { "GET", "PUT", "DELETE" }),
       Map.entry("/api/reward-issues", new String[] { "GET", "POST" }),
-      Map.entry("/api/reward-issues/{id}", new String[] { "GET", "PUT", "DELETE" }));
+      Map.entry("/api/reward-issues/{id}", new String[] { "GET", "PUT", "DELETE" }),
+      Map.entry("/api/reward-issues/export", new String[] { "GET" }));
 
   public static final Map<String, String[]> USER_URLS = Map.ofEntries(
       Map.entry("/api/users/external/{externalId}", new String[] { "GET" }),
@@ -67,7 +72,4 @@ public final class Endpoint {
       Map.entry("/api/reward-issues/{id}", new String[] { "GET" }),
       Map.entry("/api/participations", new String[] { "POST" }));
 
-  public static String[] urlPatternsFor(Map<String, String[]> endpointMap) {
-    return endpointMap.keySet().toArray(new String[0]);
-  }
 }
