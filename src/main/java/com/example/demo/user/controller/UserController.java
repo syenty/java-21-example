@@ -1,13 +1,17 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.dto.UserBlockedRequest;
 import com.example.demo.user.dto.UserLookupResponse;
 import com.example.demo.user.dto.UserUpdateRequest;
+import com.example.demo.user.dto.UserSearchParam;
 import com.example.demo.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.net.URI;
 import java.util.List;
@@ -30,8 +35,8 @@ public class UserController {
   private final UserService service;
 
   @GetMapping
-  public List<User> getAll() {
-    return service.getAll();
+  public PageWrapper<User> getAll(@Valid @ModelAttribute UserSearchParam params) {
+    return service.search(params.getName(), params.getEmployeeNumber(), PageRequest.of(params.getPage(), params.getSize()));
   }
 
   @GetMapping("/{id}")
