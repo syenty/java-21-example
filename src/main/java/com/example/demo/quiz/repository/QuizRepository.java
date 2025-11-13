@@ -9,5 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
   List<Quiz> findByEvent_IdAndQuizDateOrderByQuestionOrderAsc(Long eventId, LocalDate quizDate);
 
+  int countByEvent_IdAndQuizDate(Long eventId, LocalDate quizDate);
+
   Optional<Quiz> findByIdAndEvent_Id(Long id, Long eventId);
 }
