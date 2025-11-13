@@ -1,5 +1,6 @@
 package com.example.demo.reward.service.impl;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.common.util.ExcelUtil;
 import com.example.demo.common.util.StringUtil;
 import com.example.demo.event.domain.Event;
@@ -22,6 +23,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -233,11 +236,10 @@ public class RewardIssueServiceImpl implements RewardIssueService {
   }
 
   @Override
-  public List<RewardIssueResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end) {
+  public PageWrapper<RewardIssueResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end, Pageable pageable) {
     validatePeriod(start, end);
-    return rewardIssueRepository.findIssues(eventId, start, end).stream()
-        .map(RewardIssueResponse::of)
-        .toList();
+    Page<RewardIssue> page = rewardIssueRepository.findIssues(eventId, start, end, pageable);
+    return PageWrapper.of(page.map(RewardIssueResponse::of));
   }
 
   @Override

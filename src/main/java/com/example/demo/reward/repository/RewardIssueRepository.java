@@ -5,6 +5,8 @@ import com.example.demo.reward.dto.RewardIssueExcelRow;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,17 +23,14 @@ public interface RewardIssueRepository extends JpaRepository<RewardIssue, Long> 
 
   @Query("""
       select ri from RewardIssue ri
-      join fetch ri.event
-      join fetch ri.user
-      join fetch ri.rewardPolicy
       where (:eventId is null or ri.event.id = :eventId)
         and ri.issuedDt between :startDt and :endDt
-      order by ri.issuedDt asc
       """)
-  List<RewardIssue> findIssues(
+  Page<RewardIssue> findIssues(
       @Param("eventId") Long eventId,
       @Param("startDt") Instant startDt,
-      @Param("endDt") Instant endDt);
+      @Param("endDt") Instant endDt,
+      Pageable pageable);
 
   @Query("""
       select new com.example.demo.reward.dto.RewardIssueExcelRow(
