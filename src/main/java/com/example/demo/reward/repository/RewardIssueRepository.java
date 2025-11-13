@@ -20,6 +20,20 @@ public interface RewardIssueRepository extends JpaRepository<RewardIssue, Long> 
   long countByRewardPolicy_IdAndUser_IdAndRewardDate(Long policyId, Long userId, LocalDate rewardDate);
 
   @Query("""
+      select ri from RewardIssue ri
+      join fetch ri.event
+      join fetch ri.user
+      join fetch ri.rewardPolicy
+      where (:eventId is null or ri.event.id = :eventId)
+        and ri.issuedDt between :startDt and :endDt
+      order by ri.issuedDt asc
+      """)
+  List<RewardIssue> findIssues(
+      @Param("eventId") Long eventId,
+      @Param("startDt") Instant startDt,
+      @Param("endDt") Instant endDt);
+
+  @Query("""
       select new com.example.demo.reward.dto.RewardIssueExcelRow(
           ri.issuedDt,
           ri.rewardDate,

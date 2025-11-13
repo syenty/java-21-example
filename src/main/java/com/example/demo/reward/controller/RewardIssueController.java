@@ -28,8 +28,15 @@ public class RewardIssueController {
   private final RewardIssueService rewardIssueService;
 
   @GetMapping
-  public List<RewardIssueResponse> findAll() {
-    return rewardIssueService.findAll();
+  public ResponseEntity<List<RewardIssueResponse>> findAll(
+      @RequestParam(required = false) Long eventId,
+      @RequestParam String startDt,
+      @RequestParam String endDt) {
+
+    Instant start = DateUtil.parseUtcDateTime(startDt);
+    Instant end = DateUtil.parseUtcDateTime(endDt);
+
+    return ResponseEntity.ok(rewardIssueService.findByEventAndPeriod(eventId, start, end));
   }
 
   @GetMapping("/{id}")

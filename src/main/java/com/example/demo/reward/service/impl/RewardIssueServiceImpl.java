@@ -233,6 +233,14 @@ public class RewardIssueServiceImpl implements RewardIssueService {
   }
 
   @Override
+  public List<RewardIssueResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end) {
+    validatePeriod(start, end);
+    return rewardIssueRepository.findIssues(eventId, start, end).stream()
+        .map(RewardIssueResponse::of)
+        .toList();
+  }
+
+  @Override
   public void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response) {
     validatePeriod(start, end);
     List<RewardIssueExcelRow> rows = rewardIssueRepository.findExcelRows(eventId, start, end);

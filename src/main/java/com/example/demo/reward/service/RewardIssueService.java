@@ -24,5 +24,7 @@ public interface RewardIssueService {
   Optional<RewardIssueResponse> decideAndIssue(
       List<RewardPolicy> policies, EventParticipation participation, LocalDate rewardDate);
 
+  List<RewardIssueResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end);
+
   void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response);
 }
