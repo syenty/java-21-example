@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java-21-example
+    ports:
+      - "9090:9090"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
