@@ -27,7 +27,9 @@ public final class Endpoint {
       Map.entry("/api/auth/user-login", new String[] { "POST" }),
       Map.entry("/api/auth/event-login", new String[] { "POST" }),
       Map.entry("/api/users/lookup", new String[] { "GET" }),
-      Map.entry("/api/users/external/{externalId}", new String[] { "GET" })
+      Map.entry("/api/users/external/{externalId}", new String[] { "GET" }),
+      Map.entry("/api/phone-auth/request", new String[] { "POST" }),
+      Map.entry("/api/phone-auth/verify", new String[] { "POST" })
   );
 
   public static final Map<String, String[]> ADMIN_URLS = Map.ofEntries(
