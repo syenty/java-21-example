@@ -2,6 +2,7 @@ package com.example.demo.phoneauth.service.impl;
 
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
+import com.example.demo.common.util.StringUtil;
 import com.example.demo.phoneauth.domain.PhoneAuthRequest;
 import com.example.demo.phoneauth.dto.PhoneAuthSendRequest;
 import com.example.demo.phoneauth.dto.PhoneAuthSendResponse;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
   public PhoneAuthSendResponse requestVerification(PhoneAuthSendRequest request) {
     LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
     LocalDateTime expired = now.plusMinutes(EXPIRE_MINUTES);
-    String verificationCode = generateCode();
+    String verificationCode = StringUtil.randomNumericCode(CODE_LENGTH);
 
     PhoneAuthRequest entity = PhoneAuthRequest.builder()
         .requestId(UUID.randomUUID().toString())
@@ -78,7 +78,7 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
     phoneAuthRequestRepository.save(latest);
 
     User user = upsertUser(latest, now);
-    return new PhoneAuthVerifyResponse(user.getId());
+    return new PhoneAuthVerifyResponse(user.getExternalId());
   }
 
   private User upsertUser(PhoneAuthRequest latest, LocalDateTime verifiedAt) {
@@ -108,8 +108,4 @@ public class PhoneAuthServiceImpl implements PhoneAuthService {
     return userRepository.save(newUser);
   }
 
-  private String generateCode() {
-    int value = ThreadLocalRandom.current().nextInt(0, (int) Math.pow(10, CODE_LENGTH));
-    return String.format("%0" + CODE_LENGTH + "d", value);
-  }
 }

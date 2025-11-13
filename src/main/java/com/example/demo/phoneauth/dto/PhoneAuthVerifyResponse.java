@@ -1,3 +1,3 @@
 package com.example.demo.phoneauth.dto;
 
-public record PhoneAuthVerifyResponse(Long userId) {}
+public record PhoneAuthVerifyResponse(String externalId) {}

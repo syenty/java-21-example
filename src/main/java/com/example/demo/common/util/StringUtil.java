@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class StringUtil {
 
@@ -27,5 +28,14 @@ public final class StringUtil {
 
   public static String defaultString(String value) {
     return value != null ? value : "";
+  }
+
+  public static String randomNumericCode(int length) {
+    if (length <= 0 || length > 9) {
+      throw new IllegalArgumentException("length must be between 1 and 9");
+    }
+    int upperBound = (int) Math.pow(10, length);
+    int value = ThreadLocalRandom.current().nextInt(0, upperBound);
+    return String.format("%0" + length + "d", value);
   }
 }
