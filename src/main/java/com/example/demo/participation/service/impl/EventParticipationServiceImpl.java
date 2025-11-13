@@ -1,5 +1,6 @@
 package com.example.demo.participation.service.impl;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.common.util.DateUtil;
@@ -22,6 +23,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,11 +138,11 @@ public class EventParticipationServiceImpl implements EventParticipationService 
   }
 
   @Override
-  public List<EventParticipationResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end) {
+  public PageWrapper<EventParticipationResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end,
+      Pageable pageable) {
     validatePeriod(start, end);
-    return eventParticipationRepository.findParticipations(eventId, start, end).stream()
-        .map(EventParticipationResponse::of)
-        .toList();
+    Page<EventParticipation> page = eventParticipationRepository.findParticipations(eventId, start, end, pageable);
+    return PageWrapper.of(page.map(EventParticipationResponse::of));
   }
 
   @Override

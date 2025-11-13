@@ -5,6 +5,8 @@ import com.example.demo.participation.dto.EventParticipationExcelRow;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,15 +19,14 @@ public interface EventParticipationRepository extends JpaRepository<EventPartici
 
   @Query("""
       select ep from EventParticipation ep
-      join fetch ep.user
       where ep.event.id = :eventId
         and ep.participationDt between :startDt and :endDt
-      order by ep.participationDt asc
       """)
-  List<EventParticipation> findParticipations(
+  Page<EventParticipation> findParticipations(
       @Param("eventId") Long eventId,
       @Param("startDt") Instant startDt,
-      @Param("endDt") Instant endDt);
+      @Param("endDt") Instant endDt,
+      Pageable pageable);
 
   @Query("""
       select new com.example.demo.participation.dto.EventParticipationExcelRow(
