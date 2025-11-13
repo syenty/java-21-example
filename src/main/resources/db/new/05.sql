@@ -1,0 +1,41 @@
+CREATE TABLE reward_policy (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    event_id BIGINT NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    policy_type ENUM('FIRST_COME', 'NTH_ORDER') NOT NULL,
+    start_dt DATETIME NOT NULL,
+    end_dt DATETIME NOT NULL,
+    winner_limit_total INT NULL,
+    winner_limit_per_day INT NULL,
+    target_order INT NULL,
+    nth_scope ENUM('PER_DAY', 'EVENT') NULL,
+    user_limit_total INT NULL,
+    user_limit_per_day INT NULL,
+    reward_type ENUM('POINT', 'COUPON', 'GOODS') NOT NULL,
+    reward_value VARCHAR(200) NOT NULL,
+    created_dt DATETIME NOT NULL,
+    updated_dt DATETIME NOT NULL,
+    CONSTRAINT fk_reward_policy_event FOREIGN KEY (event_id) REFERENCES event (id),
+    INDEX idx_reward_policy_event (event_id),
+    INDEX idx_reward_policy_period (event_id, start_dt, end_dt),
+    INDEX idx_reward_policy_type (event_id, policy_type)
+);
+
+CREATE TABLE reward_issue (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    event_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    participation_id BIGINT NOT NULL,
+    reward_policy_id BIGINT NOT NULL,
+    reward_date DATE NOT NULL,
+    issued_dt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reward_issue_event FOREIGN KEY (event_id) REFERENCES event (id),
+    CONSTRAINT fk_reward_issue_user FOREIGN KEY (user_id) REFERENCES user (id),
+    CONSTRAINT fk_reward_issue_participation FOREIGN KEY (participation_id) REFERENCES event_participation (id),
+    CONSTRAINT fk_reward_issue_policy FOREIGN KEY (reward_policy_id) REFERENCES reward_policy (id),
+    INDEX idx_issue_policy (reward_policy_id),
+    INDEX idx_issue_policy_date (reward_policy_id, reward_date),
+    INDEX idx_issue_policy_user (reward_policy_id, user_id),
+    INDEX idx_issue_policy_user_date (reward_policy_id, user_id, reward_date),
+    INDEX idx_issue_event (event_id)
+);
