@@ -8,6 +8,5 @@ public record QuizRequest(
     QuizType type,
     String questionText,
     String correctText,
-    LocalDate quizDate,
-    Integer questionOrder,
-    Boolean active) {}
+    LocalDate quizDate) {
+}

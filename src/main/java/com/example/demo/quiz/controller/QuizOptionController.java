@@ -3,6 +3,7 @@ package com.example.demo.quiz.controller;
 import com.example.demo.quiz.dto.QuizOptionRequest;
 import com.example.demo.quiz.dto.QuizOptionResponse;
 import com.example.demo.quiz.service.QuizOptionService;
+
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +39,8 @@ public class QuizOptionController {
     return optionService
         .create(request)
         .map(
-            response ->
-                ResponseEntity.created(URI.create("/api/quiz-options/" + response.id()))
-                    .body(response))
+            response -> ResponseEntity.created(URI.create("/api/quiz-options/" + response.id()))
+                .body(response))
         .orElse(ResponseEntity.notFound().build());
   }
 

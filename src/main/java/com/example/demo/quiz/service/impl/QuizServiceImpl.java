@@ -67,9 +67,8 @@ public class QuizServiceImpl implements QuizService {
                   .questionText(request.questionText())
                   .correctText(request.correctText())
                   .quizDate(request.quizDate())
-                  .questionOrder(
-                      request.questionOrder() != null ? request.questionOrder() : 1)
-                  .active(request.active() != null ? request.active() : true)
+                  .questionOrder(nextQuestionOrder(event.getId(), request.quizDate()))
+                  .active(true)
                   .build();
               Quiz saved = quizRepository.save(quiz);
               return QuizAdminResponse.of(saved, Collections.emptyList());
@@ -96,8 +95,8 @@ public class QuizServiceImpl implements QuizService {
                             request.questionText(),
                             request.correctText(),
                             request.quizDate(),
-                            request.questionOrder(),
-                            request.active());
+                            null,
+                            null);
                         return QuizAdminResponse.of(quiz, loadAdminOptions(quiz.getId()));
                       });
             });
@@ -206,5 +205,11 @@ public class QuizServiceImpl implements QuizService {
     }
 
     return true;
+  }
+
+  @Override
+  public int nextQuestionOrder(Long eventId, LocalDate quizDate) {
+    int count = quizRepository.countByEvent_IdAndQuizDate(eventId, quizDate);
+    return count + 1;
   }
 }

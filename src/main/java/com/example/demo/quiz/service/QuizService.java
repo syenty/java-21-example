@@ -26,4 +26,6 @@ public interface QuizService {
   boolean isCorrectAnswer(Long quizId, Long eventId, String answer);
 
   boolean areAllAnswersCorrect(Long eventId, List<EventParticipationRequest.QuizAnswer> answers);
+
+  int nextQuestionOrder(Long eventId, LocalDate quizDate);
 }
