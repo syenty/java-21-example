@@ -28,8 +28,15 @@ public class EventParticipationController {
   private final EventParticipationService eventParticipationService;
 
   @GetMapping
-  public List<EventParticipationResponse> findAll() {
-    return eventParticipationService.findAll();
+  public ResponseEntity<List<EventParticipationResponse>> findAll(
+      @RequestParam Long eventId,
+      @RequestParam String startDt,
+      @RequestParam String endDt) {
+
+    Instant start = DateUtil.parseUtcDateTime(startDt);
+    Instant end = DateUtil.parseUtcDateTime(endDt);
+
+    return ResponseEntity.ok(eventParticipationService.findByEventAndPeriod(eventId, start, end));
   }
 
   @GetMapping("/{id}")
@@ -43,10 +50,9 @@ public class EventParticipationController {
     return eventParticipationService
         .create(request)
         .map(
-            response ->
-                ResponseEntity.created(
-                        URI.create("/api/event-participations/" + response.id()))
-                    .body(response))
+            response -> ResponseEntity.created(
+                URI.create("/api/event-participations/" + response.id()))
+                .body(response))
         .orElse(ResponseEntity.notFound().build());
   }
 

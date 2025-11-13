@@ -18,5 +18,7 @@ public interface EventParticipationService {
 
   boolean delete(Long id);
 
+  List<EventParticipationResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end);
+
   void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response);
 }

@@ -135,10 +135,16 @@ public class EventParticipationServiceImpl implements EventParticipationService 
   }
 
   @Override
+  public List<EventParticipationResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end) {
+    validatePeriod(start, end);
+    return eventParticipationRepository.findParticipations(eventId, start, end).stream()
+        .map(EventParticipationResponse::of)
+        .toList();
+  }
+
+  @Override
   public void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response) {
-    if (start == null || end == null || start.isAfter(end)) {
-      throw new IllegalArgumentException("유효한 기간이 필요합니다.");
-    }
+    validatePeriod(start, end);
 
     List<EventParticipationExcelRow> rows = eventParticipationRepository.findExcelRows(eventId, start, end);
 
@@ -156,5 +162,11 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         "event-participations.xlsx",
         PARTICIPATION_HEADERS,
         body);
+  }
+
+  private void validatePeriod(Instant start, Instant end) {
+    if (start == null || end == null || start.isAfter(end)) {
+      throw new IllegalArgumentException("유효한 기간이 필요합니다.");
+    }
   }
 }
