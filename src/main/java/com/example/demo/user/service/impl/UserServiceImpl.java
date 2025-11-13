@@ -1,5 +1,6 @@
 package com.example.demo.user.service.impl;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.user.domain.User;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -19,8 +22,9 @@ public class UserServiceImpl implements UserService {
   private final UserRepository repository;
 
   @Override
-  public List<User> getAll() {
-    return repository.findAll();
+  public PageWrapper<User> search(String name, String employeeNumber, Pageable pageable) {
+    Page<User> page = repository.findAll(pageable);
+    return PageWrapper.of(page);
   }
 
   @Override

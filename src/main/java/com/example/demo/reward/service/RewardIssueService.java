@@ -1,5 +1,6 @@
 package com.example.demo.reward.service;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.participation.domain.EventParticipation;
 import com.example.demo.reward.domain.RewardPolicy;
 import com.example.demo.reward.dto.RewardIssueRequest;
@@ -9,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 
 public interface RewardIssueService {
   List<RewardIssueResponse> findAll();
@@ -23,6 +25,8 @@ public interface RewardIssueService {
 
   Optional<RewardIssueResponse> decideAndIssue(
       List<RewardPolicy> policies, EventParticipation participation, LocalDate rewardDate);
+
+  PageWrapper<RewardIssueResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end, Pageable pageable);
 
   void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response);
 }

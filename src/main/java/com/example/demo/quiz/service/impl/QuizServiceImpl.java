@@ -2,6 +2,7 @@ package com.example.demo.quiz.service.impl;
 
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.event.repository.EventRepository;
 import com.example.demo.participation.dto.EventParticipationRequest;
 import com.example.demo.quiz.domain.Quiz;
@@ -10,6 +11,7 @@ import com.example.demo.quiz.dto.QuizAdminResponse;
 import com.example.demo.quiz.dto.QuizOptionResponse;
 import com.example.demo.quiz.dto.QuizOptionUserResponse;
 import com.example.demo.quiz.dto.QuizRequest;
+import com.example.demo.quiz.dto.QuizSearchParam;
 import com.example.demo.quiz.dto.QuizUserResponse;
 import com.example.demo.quiz.repository.QuizOptionRepository;
 import com.example.demo.quiz.repository.QuizRepository;
@@ -22,6 +24,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +40,10 @@ public class QuizServiceImpl implements QuizService {
   private final QuizOptionRepository quizOptionRepository;
 
   @Override
-  public List<QuizAdminResponse> findAll() {
-    List<Quiz> quizzes = quizRepository.findAll();
-    Map<Long, List<QuizOptionResponse>> optionMap = groupAdminOptionsByQuizIds(quizzes);
-    return quizzes.stream()
-        .map(quiz -> QuizAdminResponse.of(quiz, optionMap.getOrDefault(quiz.getId(), List.of())))
-        .toList();
+  public PageWrapper<QuizAdminResponse> search(QuizSearchParam params, Pageable pageable) {
+    Page<Quiz> page = quizRepository.search(params.getQuizDate(), params.getQuestionText(), pageable);
+    Map<Long, List<QuizOptionResponse>> optionMap = groupAdminOptionsByQuizIds(page.getContent());
+    return PageWrapper.of(page.map(quiz -> QuizAdminResponse.of(quiz, optionMap.getOrDefault(quiz.getId(), List.of()))));
   }
 
   @Override

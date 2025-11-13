@@ -1,5 +1,6 @@
 package com.example.demo.participation.service.impl;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
 import com.example.demo.common.util.DateUtil;
@@ -22,6 +23,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,10 +138,16 @@ public class EventParticipationServiceImpl implements EventParticipationService 
   }
 
   @Override
+  public PageWrapper<EventParticipationResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end,
+      Pageable pageable) {
+    validatePeriod(start, end);
+    Page<EventParticipation> page = eventParticipationRepository.findParticipations(eventId, start, end, pageable);
+    return PageWrapper.of(page.map(EventParticipationResponse::of));
+  }
+
+  @Override
   public void downloadExcel(Long eventId, Instant start, Instant end, HttpServletResponse response) {
-    if (start == null || end == null || start.isAfter(end)) {
-      throw new IllegalArgumentException("유효한 기간이 필요합니다.");
-    }
+    validatePeriod(start, end);
 
     List<EventParticipationExcelRow> rows = eventParticipationRepository.findExcelRows(eventId, start, end);
 
@@ -156,5 +165,11 @@ public class EventParticipationServiceImpl implements EventParticipationService 
         "event-participations.xlsx",
         PARTICIPATION_HEADERS,
         body);
+  }
+
+  private void validatePeriod(Instant start, Instant end) {
+    if (start == null || end == null || start.isAfter(end)) {
+      throw new IllegalArgumentException("유효한 기간이 필요합니다.");
+    }
   }
 }

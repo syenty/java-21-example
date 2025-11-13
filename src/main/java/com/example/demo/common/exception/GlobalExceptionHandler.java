@@ -1,8 +1,11 @@
 package com.example.demo.common.exception;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,6 +37,27 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
     return buildResponse(ErrorCode.AUTH_FORBIDDEN);
+  }
+
+  /**
+   * 파라미터 검증 실패
+   */
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ValidationErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+    List<ValidationError> errors = ex.getBindingResult()
+        .getFieldErrors()
+        .stream()
+        .map(fieldError -> new ValidationError(fieldError.getField(), fieldError.getDefaultMessage()))
+        .collect(Collectors.toList());
+
+    ValidationErrorResponse body = new ValidationErrorResponse(
+        ErrorCode.INVALID_PARAMETER.getCode(),
+        ErrorCode.INVALID_PARAMETER.getMessage(),
+        errors);
+
+    return ResponseEntity
+        .status(ErrorCode.INVALID_PARAMETER.getStatus())
+        .body(body);
   }
 
   /**

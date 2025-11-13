@@ -26,6 +26,7 @@ public enum ErrorCode {
   AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A003", "유효하지 않은 토큰입니다."),
   AUTH_BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "A004", "아이디 또는 비밀번호가 올바르지 않습니다."),
 
+  INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "C001", "요청 파라미터가 올바르지 않습니다."),
   PHONE_AUTH_NOT_FOUND(HttpStatus.BAD_REQUEST, "P100", "인증 요청을 찾을 수 없습니다."),
   PHONE_AUTH_EXPIRED(HttpStatus.BAD_REQUEST, "P101", "인증번호 유효시간이 지났습니다."),
   PHONE_AUTH_INVALID_CODE(HttpStatus.BAD_REQUEST, "P102", "인증번호가 일치하지 않습니다."),

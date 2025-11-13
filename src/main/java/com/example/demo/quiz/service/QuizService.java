@@ -1,15 +1,18 @@
 package com.example.demo.quiz.service;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.participation.dto.EventParticipationRequest;
 import com.example.demo.quiz.dto.QuizAdminResponse;
 import com.example.demo.quiz.dto.QuizRequest;
+import com.example.demo.quiz.dto.QuizSearchParam;
 import com.example.demo.quiz.dto.QuizUserResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 
 public interface QuizService {
-  List<QuizAdminResponse> findAll();
+  PageWrapper<QuizAdminResponse> search(QuizSearchParam params, Pageable pageable);
 
   Optional<QuizAdminResponse> findById(Long id);
 

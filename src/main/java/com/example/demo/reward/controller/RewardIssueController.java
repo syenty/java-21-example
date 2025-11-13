@@ -1,14 +1,16 @@
 package com.example.demo.reward.controller;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.common.util.DateUtil;
 import com.example.demo.reward.dto.RewardIssueRequest;
 import com.example.demo.reward.dto.RewardIssueResponse;
+import com.example.demo.reward.dto.RewardIssueSearchParam;
 import com.example.demo.reward.service.RewardIssueService;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.time.Instant;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/reward-issues")
@@ -28,8 +32,18 @@ public class RewardIssueController {
   private final RewardIssueService rewardIssueService;
 
   @GetMapping
-  public List<RewardIssueResponse> findAll() {
-    return rewardIssueService.findAll();
+  public ResponseEntity<PageWrapper<RewardIssueResponse>> findAll(
+      @Valid @ModelAttribute RewardIssueSearchParam params) {
+
+    Instant start = DateUtil.parseUtcDateTime(params.getStartDt());
+    Instant end = DateUtil.parseUtcDateTime(params.getEndDt());
+
+    return ResponseEntity.ok(
+        rewardIssueService.findByEventAndPeriod(
+            params.getEventId(),
+            start,
+            end,
+            PageRequest.of(params.getPage(), params.getSize())));
   }
 
   @GetMapping("/{id}")

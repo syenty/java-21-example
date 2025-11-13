@@ -1,12 +1,16 @@
 package com.example.demo.quiz.controller;
 
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.quiz.dto.QuizAdminResponse;
 import com.example.demo.quiz.dto.QuizRequest;
+import com.example.demo.quiz.dto.QuizSearchParam;
 import com.example.demo.quiz.dto.QuizUserResponse;
 import com.example.demo.quiz.service.QuizService;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @RestController
 @RequestMapping("/api/quizzes")
@@ -25,8 +30,8 @@ public class QuizController {
   private final QuizService quizService;
 
   @GetMapping
-  public List<QuizAdminResponse> findAll() {
-    return quizService.findAll();
+  public PageWrapper<QuizAdminResponse> findAll(@Valid @ModelAttribute QuizSearchParam params) {
+    return quizService.search(params, PageRequest.of(params.getPage(), params.getSize()));
   }
 
   @GetMapping("/{id}")
