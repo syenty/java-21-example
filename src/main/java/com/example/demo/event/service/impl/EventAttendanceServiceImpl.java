@@ -2,6 +2,7 @@ package com.example.demo.event.service.impl;
 
 import com.example.demo.common.exception.BusinessException;
 import com.example.demo.common.exception.ErrorCode;
+import com.example.demo.common.dto.PageWrapper;
 import com.example.demo.common.util.ExcelUtil;
 import com.example.demo.common.util.StringUtil;
 import com.example.demo.event.domain.Event;
@@ -19,6 +20,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,12 +77,11 @@ public class EventAttendanceServiceImpl implements EventAttendanceService {
   }
 
   @Override
-  public List<EventAttendanceResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end) {
+  public PageWrapper<EventAttendanceResponse> findByEventAndPeriod(Long eventId, Instant start, Instant end, Pageable pageable) {
     validatePeriod(start, end);
-    return attendanceRepository.findAttendances(eventId, start, end)
-        .stream()
-        .map(EventAttendanceResponse::of)
-        .toList();
+    Page<EventAttendance> page = attendanceRepository.findAttendances(eventId, start, end, pageable);
+    Page<EventAttendanceResponse> mapped = page.map(EventAttendanceResponse::of);
+    return PageWrapper.of(mapped);
   }
 
   @Override

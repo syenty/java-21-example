@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,15 +20,14 @@ public interface EventAttendanceRepository extends JpaRepository<EventAttendance
 
   @Query("""
       select ea from EventAttendance ea
-      join fetch ea.user
       where ea.event.id = :eventId
         and ea.attendanceDt between :startDt and :endDt
-      order by ea.attendanceDt asc
       """)
-  List<EventAttendance> findAttendances(
+  Page<EventAttendance> findAttendances(
       @Param("eventId") Long eventId,
       @Param("startDt") Instant startDt,
-      @Param("endDt") Instant endDt);
+      @Param("endDt") Instant endDt,
+      Pageable pageable);
 
   @Query("""
       select new com.example.demo.event.dto.EventAttendanceExcelRow(
